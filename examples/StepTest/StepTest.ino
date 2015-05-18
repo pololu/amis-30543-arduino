@@ -1,14 +1,15 @@
+#include <AMIS30543.h>
 #include <SPI.h>
-#include <AStar32U4Prime.h>
+#include <AStar32U4Prime.h>  // TODO: remove
+
+const uint8_t amisSlaveSelect = 10;
+
+AMIS30543 stepper;
 
 AStar32U4PrimeButtonA buttonA;
 AStar32U4PrimeButtonB buttonB;
 AStar32U4PrimeButtonC buttonC;
 
-#define DATAOUT 16  //MOSI
-#define DATAIN  14  //MISO
-#define SPICLOCK  15  //sck
-#define SLAVESELECT 10  //ss
 SPISettings settings(500000, MSBFIRST, SPI_MODE0);
 
 #define STEP 9  //STEP
@@ -48,15 +49,17 @@ SPISettings settings(500000, MSBFIRST, SPI_MODE0);
 #define WDT 14
 
 
-void setup() 
+void setup()
 {
-  delay(3000);
+  delay(1000);
+  Serial.begin(9600);
   Serial.println("start");
-  pinMode (SLAVESELECT, OUTPUT);  //set the ss pin as an output
+
   SPI.begin();  //initialize SPI
-  
-  pinMode (STEP, OUTPUT);
-  
+  stepper.init(amisSlaveSelect);
+
+  pinMode(STEP, OUTPUT);
+
   Serial.println("AMIS SPI test");
   while (1)
   {
@@ -67,14 +70,14 @@ void setup()
     }
   }
   //All registers should start out with 0 in them after reset
-  //so to verify that SPI is working, we will write to one and 
-  //then read from it. 
+  //so to verify that SPI is working, we will write to one and
+  //then read from it.
   Serial.print("DIRCTRL = ");
   Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL
   SPIwriteParam(DIRCTRL, 1);  //write to DIRCTRL
   Serial.print("DIRCTRL = ");
   Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL  
-  
+
   while (1)
   {
     if (buttonB.getSingleDebouncedRelease())
@@ -90,8 +93,8 @@ void setup()
   Serial.println((SPItransmit(READ, CR2, 0) & B10000000)>>7);  //print value from DIRCTRL
   SPIwriteParam(MOTEN, 1);  //write to DIRCTRL
   Serial.print("MOTEN = ");
-  Serial.println((SPItransmit(READ, CR2, 0) & B10000000)>>7);  //print value from DIRCTRL 
-  
+  Serial.println((SPItransmit(READ, CR2, 0) & B10000000)>>7);  //print value from DIRCTRL
+
   Serial.print("CPFail = ");
   Serial.println((SPItransmit(READ, SR0, 0) & B00100000)>>5);
   Serial.print("Micro-step position = ");
@@ -100,23 +103,23 @@ void setup()
   Serial.println((SPItransmit(READ, SR0, 0) & B00001000)>>3);
   Serial.print("OPEN Coil Y = ");
   Serial.println((SPItransmit(READ, SR0, 0) & B00000100)>>2);
-  
+
   //Next lets try setting the current limit higher
   Serial.print("CUR = ");
   Serial.println((SPItransmit(READ, CR0, 0) & B00011111)>>0);  //print value from DIRCTRL
   SPIwriteParam(CUR, 10);  //write to DIRCTRL
   Serial.print("CUR = ");
-  Serial.println((SPItransmit(READ, CR0, 0) & B00011111)>>0);  //print value from DIRCTRL 
+  Serial.println((SPItransmit(READ, CR0, 0) & B00011111)>>0);  //print value from DIRCTRL
 }
 
-void loop() 
+void loop()
 {
   //Now lets step the motor
   digitalWrite(STEP, HIGH);
   delay(1);
   digitalWrite(STEP, LOW);
   delay(10);
-  
+
   //If we press the button again display the microstep
   if(!buttonA.isPressed())
   {
@@ -130,7 +133,7 @@ void SPIwriteParam(int param, byte newData)
   //Before writing a single param we must read what is already at
   //that address so we can preserve it.
   byte prevData;
-  
+
   switch(param)
   {
     case DIRCTRL:
@@ -192,11 +195,12 @@ void SPIwriteParam(int param, byte newData)
   }
 }
 
-byte SPItransmit(int cmd, int adr, byte dataIn) 
+byte SPItransmit(int cmd, int adr, byte dataIn)
 {
-  digitalWrite(SLAVESELECT,LOW);  //take the ss pin low to select the chip
-  SPI.transfer(cmd<<5 | adr);  //send command and address byte
-  byte dataOut = SPI.transfer(dataIn);  //send data byte for write and read data dyte for read
-  digitalWrite(SLAVESELECT,HIGH); //take the ss pin high to de-select the chip
-  return dataOut;
+    digitalWrite(amisSlaveSelect, LOW);  //take the ss pin low to select the chip
+    SPI.transfer(cmd<<5 | adr);  //send command and address byte
+    byte dataOut = SPI.transfer(dataIn);  //send data byte for write and read data dyte for read
+    digitalWrite(amisSlaveSelect, HIGH); //take the ss pin high to de-select the chip
+    return dataOut;
 }
+
