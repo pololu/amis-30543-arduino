@@ -27,8 +27,8 @@ public:
     {
         ssPin = slaveSelectPin;
 
-        digitalWrite(slaveSelectPin, HIGH);
-        pinMode(slaveSelectPin, OUTPUT);
+        digitalWrite(ssPin, HIGH);
+        pinMode(ssPin, OUTPUT);
     }
 
     uint8_t readReg(uint8_t address)

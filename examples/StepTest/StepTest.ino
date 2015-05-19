@@ -69,8 +69,8 @@ void setup()
     }
   }
 
-  SPIwriteParam(CUR, 10);  //write to DIRCTRL
-  SPIwriteParam(MOTEN, 1);
+  cur();
+  moten();
   //stepper.enableDriver();
 }
 
@@ -85,71 +85,20 @@ void loop()
   delay(1);
 }
 
-void SPIwriteParam(int param, byte newData)
+void moten()
 {
-  //Before writing a single param we must read what is already at
-  //that address so we can preserve it.
-  byte prevData;
-
-  switch(param)
-  {
-    case DIRCTRL:
-    prevData = SPItransmit(READ, CR1, 0) & B01111111;
-    SPItransmit(WRITE, CR1, prevData | newData<<7);
-    break;
-    case NXTP:
-    prevData = SPItransmit(READ, CR1, 0) & B10111111;
-    SPItransmit(WRITE, CR1, prevData | newData<<6);
-    break;
-    case EMC:
-    prevData = SPItransmit(READ, CR1, 0) & B11111100;
-    SPItransmit(WRITE, CR1, prevData | newData<<0);
-    break;
-    case SLAT:
-    prevData = SPItransmit(READ, CR2, 0) & B11101111;
-    SPItransmit(WRITE, CR2, prevData | newData<<4);
-    break;
-    case SLAG:
-    prevData = SPItransmit(READ, CR2, 0) & B11011111;
-    SPItransmit(WRITE, CR2, prevData | newData<<5);
-    break;
-    case PWMF:
-    prevData = SPItransmit(READ, CR1, 0) & B11110111;
-    SPItransmit(WRITE, CR1, prevData | newData<<3);
-    break;
-    case PWMJ:
-    prevData = SPItransmit(READ, CR1, 0) & B11111011;
-    SPItransmit(WRITE, CR1, prevData | newData<<2);
-    break;
-    case SM:
-    prevData = SPItransmit(READ, CR0, 0) & B00011111;
-    SPItransmit(WRITE, CR0, prevData | newData<<5);
-    break;
-    case ESM:
-    prevData = SPItransmit(READ, CR3, 0) & B11111000;
-    SPItransmit(WRITE, CR3, prevData | newData<<0);
-    break;
-    case SLP:
-    prevData = SPItransmit(READ, CR2, 0) & B10111111;
-    SPItransmit(WRITE, CR2, prevData | newData<<6);
-    break;
-    case MOTEN:
+    byte prevData;
+    byte newData = 1;
     prevData = SPItransmit(READ, CR2, 0) & B01111111;
     SPItransmit(WRITE, CR2, prevData | newData<<7);
-    break;
-    case CUR:
+}
+
+void cur()
+{
+    byte prevData;
+    byte newData = 10;
     prevData = SPItransmit(READ, CR0, 0) & B11100000;
     SPItransmit(WRITE, CR0, prevData | newData<<0);
-    break;
-    case WDEN:
-    prevData = SPItransmit(READ, WR, 0) & B01111111;
-    SPItransmit(WRITE, WR, prevData | newData<<7);
-    break;
-    case WDT:
-    prevData = SPItransmit(READ, WR, 0) & B10000111;
-    SPItransmit(WRITE, WR, prevData | newData<<3);
-    break;
-  }
 }
 
 byte SPItransmit(int cmd, int adr, byte dataIn)
