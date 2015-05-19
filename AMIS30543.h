@@ -63,13 +63,13 @@ private:
     void selectChip()
     {
         digitalWrite(ssPin, LOW);
-        //SPI.beginTransaction(settings);
+        SPI.beginTransaction(settings);
     }
 
     void deselectChip()
     {
        digitalWrite(ssPin, HIGH);
-       //SPI.endTransaction();
+       SPI.endTransaction();
 
        // The CS high time is specified as 2.5 us in the
        // AMIS-30543 datasheet.
@@ -142,6 +142,13 @@ public:
         writeCR0();
     }
 
+    uint16_t readPosition()
+    {
+        uint8_t sr3 = readStatusReg(AMIS30543Raw::SR3);
+        uint8_t sr4 = readStatusReg(AMIS30543Raw::SR4);
+        return ((uint16_t)sr3 << 2) | (sr4 & 3);
+    }
+
 protected:
     uint8_t wr;
     uint8_t cr0;
@@ -156,6 +163,14 @@ protected:
         writeCR1();
         writeCR2();
         writeCR3();
+    }
+
+    uint8_t readStatusReg(uint8_t address)
+    {
+        // Mask off the parity bit.
+        // (Later we might add code here to check the parity
+        // bit and record errors.)
+        return driver.readReg(address) & 0x7F;
     }
 
     void writeWR()

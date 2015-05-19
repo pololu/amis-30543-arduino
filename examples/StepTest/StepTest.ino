@@ -41,6 +41,7 @@ void setup()
 
   testResetSettings();
   testEnableDriver();
+  testSteppingAndReadingPosition();
 
   success();
   stepper.resetSettings();
@@ -50,13 +51,6 @@ void setup()
 
 void loop()
 {
-  // The NXT minimum high pulse width is 2 microseconds.
-  digitalWrite(amisStepPin, HIGH);
-  delayMicroseconds(3);
-  digitalWrite(amisStepPin, LOW);
-  delayMicroseconds(3);
-
-  delay(1);
 }
 
 void testResetSettings()
@@ -118,6 +112,29 @@ void testEnableDriver()
   }
 }
 
+void testSteppingAndReadingPosition()
+{
+  resetDriver();
+  stepper.enableDriver();
+
+  Serial.println(F("Test readPosition"));
+
+  uint16_t pos0 = stepper.readPosition();
+  nextStep();
+  uint16_t pos1 = stepper.readPosition();
+  nextStep();
+  uint16_t pos2 = stepper.readPosition();
+
+  if (pos0 != 0 || pos1 != 4 || pos2 != 8)
+  {
+    Serial.println(F("Microstep positions are wrong."));
+    Serial.println(pos0);
+    Serial.println(pos1);
+    Serial.println(pos2);
+    error();
+  }
+}
+
 void writeReg(uint8_t address, uint8_t value)
 {
   stepper.driver.writeReg(address, value);
@@ -128,11 +145,27 @@ uint8_t readReg(uint8_t address)
   return stepper.driver.readReg(address);
 }
 
+uint8_t readStatusReg(uint8_t address)
+{
+  return readReg(address) & 0x7F;
+}
+
 void resetDriver()
 {
-  digitalWrite(amisStepPin, HIGH);
+  digitalWrite(amisClrPin, HIGH);
   delay(1);
+  digitalWrite(amisClrPin, LOW);
+  delay(1);
+}
+
+void nextStep()
+{
+  // The NXT minimum high pulse width is 2 microseconds.
+  digitalWrite(amisStepPin, HIGH);
+  delayMicroseconds(3);
   digitalWrite(amisStepPin, LOW);
+  delayMicroseconds(3);
+
   delay(1);
 }
 
