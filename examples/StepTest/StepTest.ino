@@ -42,6 +42,7 @@ void setup()
   testResetSettings();
   testEnableDriver();
   testSteppingAndReadingPosition();
+  testDirControl();
 
   success();
   stepper.resetSettings();
@@ -131,6 +132,26 @@ void testSteppingAndReadingPosition()
     Serial.println(pos0);
     Serial.println(pos1);
     Serial.println(pos2);
+    error();
+  }
+}
+
+void testDirControl()
+{
+  resetDriver();
+  stepper.enableDriver();
+  stepper.setDirection(1);
+  nextStep();
+  uint16_t pos0 = stepper.readPosition();
+  stepper.setDirection(0);
+  nextStep();
+  uint16_t pos1 = stepper.readPosition();
+
+  if (pos0 != 508 || pos1 != 0)
+  {
+    Serial.println(F("DIRCTRL: Microstep positions are wrong."));
+    Serial.println(pos0);
+    Serial.println(pos1);
     error();
   }
 }

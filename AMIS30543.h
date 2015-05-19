@@ -46,8 +46,8 @@ public:
         transfer(0x80 | (address & 0b11111));
         transfer(value);
 
-        // The CS line must go high after writing for the value to
-        // actually take effect.
+        // The CS line must go high after writing for the value to actually take
+        // effect.
         deselectChip();
     }
 
@@ -71,8 +71,7 @@ private:
        digitalWrite(ssPin, HIGH);
        SPI.endTransaction();
 
-       // The CS high time is specified as 2.5 us in the
-       // AMIS-30543 datasheet.
+       // The CS high time is specified as 2.5 us in the AMIS-30543 datasheet.
        delayMicroseconds(3);
     }
 
@@ -106,8 +105,11 @@ public:
         writeCR2();
     }
 
-    // Sets the current equal to the highest available setting that is
-    // less than the given current.
+    /*! Sets the per-coil current limit equal to the highest available setting
+     * that is less than the given current, in units of milliamps.
+     *
+     * Refer to Table 13 of the AMIS 30543 datasheet to see which current limits
+     * are available. */
     void setCurrentMilliamps(uint16_t current)
     {
         // This comes from Table 13 of the AMIS-30543 datasheet.
@@ -142,11 +144,40 @@ public:
         writeCR0();
     }
 
+    /*! Reads the current microstepping position, which is a number between 0
+     * and 511.
+     *
+     * The different positions and their corresponding coil values are listed in
+     * Table 9 of the AMIS 30543 datasheet.
+     *
+     * The lower two bits of this return value might be inaccurate if the step
+     * pin is being toggled while this function runs (e.g. from an interrupt or
+     * a PWM signal).
+     */
     uint16_t readPosition()
     {
         uint8_t sr3 = readStatusReg(AMIS30543Raw::SR3);
         uint8_t sr4 = readStatusReg(AMIS30543Raw::SR4);
         return ((uint16_t)sr3 << 2) | (sr4 & 3);
+    }
+
+    /*! Sets the value of the DIRCTRL configuration bit.
+     *
+     * Allowed values are 0 or 1.
+     *
+     * You can use this command to control the direction of the stepper motor
+     * and simply leave the DIR pin disconnected. */
+    void setDirection(bool value)
+    {
+        if (value)
+        {
+            cr1 |= 0x80;
+        }
+        else
+        {
+            cr1 &= ~0x80;
+        }
+        writeCR1();
     }
 
 protected:
@@ -199,7 +230,7 @@ protected:
     }
 
 public:
-    // This is only marked as public for the purpose of testing; you
-    // should not use it normally.
+    // This is only marked as public for the purpose of testing; you should not
+    // use it normally.
     AMIS30543Raw driver;
 };
