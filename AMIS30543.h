@@ -183,5 +183,8 @@ protected:
         driver.writeReg(AMIS30543Raw::CR3, cr3);
     }
 
+public:
+    // This is only marked as public for the purpose of testing; you
+    // should not use it normally.
     AMIS30543Raw driver;
 };
