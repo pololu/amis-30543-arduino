@@ -63,13 +63,13 @@ private:
     void selectChip()
     {
         digitalWrite(ssPin, LOW);
-        // TODO: SPI.beginTransaction(settings);
+        SPI.beginTransaction(settings);
     }
 
     void deselectChip()
     {
        digitalWrite(ssPin, HIGH);
-       // TODO: SPI.endTransaction();
+       SPI.endTransaction();
 
        // The CS high time is specified as 2.5 us in the
        // AMIS-30543 datasheet.
@@ -115,6 +115,7 @@ public:
     // less than the given current.
     void setCurrentMilliamps(uint16_t current)
     {
+        // This comes from Table 13 of the AMIS-30543 datasheet.
         uint8_t code = 0;
         if      (current >= 3000) { code = 0b11001; }
         else if (current >= 2845) { code = 0b11000; }
