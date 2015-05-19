@@ -101,18 +101,49 @@ public:
 
     void enableDriver()
     {
-        cr0 = 10; // tmphax
-        writeCR0(); // tmphax
-
         cr2 |= 0b10000000;
         writeCR2();
-
     }
 
     void disableDriver()
     {
         cr2 &= ~0b10000000;
         writeCR2();
+    }
+
+    // Sets the current equal to the highest available setting that is
+    // less than the given current.
+    void setCurrentMilliamps(uint16_t current)
+    {
+        uint8_t code = 0;
+        if      (current >= 3000) { code = 0b11001; }
+        else if (current >= 2845) { code = 0b11000; }
+        else if (current >= 2700) { code = 0b10111; }
+        else if (current >= 2440) { code = 0b10110; }
+        else if (current >= 2240) { code = 0b10101; }
+        else if (current >= 2070) { code = 0b10100; }
+        else if (current >= 1850) { code = 0b10011; }
+        else if (current >= 1695) { code = 0b10010; }
+        else if (current >= 1520) { code = 0b10001; }
+        else if (current >= 1405) { code = 0b10000; }
+        else if (current >= 1260) { code = 0b01111; }
+        else if (current >= 1150) { code = 0b01110; }
+        else if (current >= 1060) { code = 0b01101; }
+        else if (current >=  955) { code = 0b01100; }
+        else if (current >=  870) { code = 0b01011; }
+        else if (current >=  780) { code = 0b01010; }
+        else if (current >=  715) { code = 0b01001; }
+        else if (current >=  640) { code = 0b01000; }
+        else if (current >=  585) { code = 0b00111; }
+        else if (current >=  540) { code = 0b00110; }
+        else if (current >=  485) { code = 0b00101; }
+        else if (current >=  445) { code = 0b00100; }
+        else if (current >=  395) { code = 0b00011; }
+        else if (current >=  355) { code = 0b00010; }
+        else if (current >=  245) { code = 0b00001; }
+
+        cr0 = (cr0 & 0b11100000) | code;
+        writeCR0();
     }
 
 private:

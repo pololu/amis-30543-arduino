@@ -34,6 +34,7 @@ void setup()
   ledYellow(1);
 
   stepper.init(amisSlaveSelect);
+  stepper.setCurrentMilliamps(800);
   stepper.enableDriver();
 }
 
