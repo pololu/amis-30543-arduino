@@ -34,7 +34,7 @@ public:
     uint8_t readReg(uint8_t address)
     {
         selectChip();
-        transfer(address);
+        transfer(address & 0b11111);
         uint8_t dataOut = transfer(0);
         deselectChip();
         return dataOut;
@@ -43,7 +43,7 @@ public:
     void writeReg(uint8_t address, uint8_t value)
     {
         selectChip();
-        transfer(address);
+        transfer(0x80 | (address & 0b11111));
         transfer(value);
 
         // The CS line must go high after writing for the value to
