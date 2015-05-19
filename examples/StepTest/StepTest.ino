@@ -69,39 +69,9 @@ void setup()
       break;
     }
   }
-  //All registers should start out with 0 in them after reset
-  //so to verify that SPI is working, we will write to one and
-  //then read from it.
-  Serial.print("DIRCTRL = ");
-  Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL
-  SPIwriteParam(DIRCTRL, 1);  //write to DIRCTRL
-  Serial.print("DIRCTRL = ");
-  Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL
 
-  //Next lets test some of the status bits like charge pump
-  //failure, micro-step position, and OPEN Coil
-  //First we might have to enable the motor outputs
-  Serial.print("MOTEN = ");
-  Serial.println((SPItransmit(READ, CR2, 0) & B10000000)>>7);  //print value from DIRCTRL
-  SPIwriteParam(MOTEN, 1);  //write to DIRCTRL
-  Serial.print("MOTEN = ");
-  Serial.println((SPItransmit(READ, CR2, 0) & B10000000)>>7);  //print value from DIRCTRL
-
-  Serial.print("CPFail = ");
-  Serial.println((SPItransmit(READ, SR0, 0) & B00100000)>>5);
-  Serial.print("Micro-step position = ");
-  Serial.println(SPItransmit(READ, SR3, 0) & B01111111);
-  Serial.print("OPEN Coil X = ");
-  Serial.println((SPItransmit(READ, SR0, 0) & B00001000)>>3);
-  Serial.print("OPEN Coil Y = ");
-  Serial.println((SPItransmit(READ, SR0, 0) & B00000100)>>2);
-
-  // Next lets try setting the current limit higher
-  Serial.print("CUR = ");
-  Serial.println((SPItransmit(READ, CR0, 0) & B00011111)>>0);  //print value from DIRCTRL
   SPIwriteParam(CUR, 10);  //write to DIRCTRL
-  Serial.print("CUR = ");
-  Serial.println((SPItransmit(READ, CR0, 0) & B00011111)>>0);  //print value from DIRCTRL
+  SPIwriteParam(MOTEN, 1);
 }
 
 void loop()
