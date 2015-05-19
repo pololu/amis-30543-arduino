@@ -1,5 +1,5 @@
-#include <AMIS30543.h>
 #include <SPI.h>
+#include <AMIS30543.h>
 #include <AStar32U4Prime.h>  // TODO: remove
 
 const uint8_t amisSlaveSelect = 10;
@@ -76,16 +76,8 @@ void setup()
   Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL
   SPIwriteParam(DIRCTRL, 1);  //write to DIRCTRL
   Serial.print("DIRCTRL = ");
-  Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL  
+  Serial.println((SPItransmit(READ, CR1, 0) & B10000000)>>7);  //print value from DIRCTRL
 
-  while (1)
-  {
-    if (buttonB.getSingleDebouncedRelease())
-    {
-      Serial.println("button pushed");
-      break;
-    }
-  }
   //Next lets test some of the status bits like charge pump
   //failure, micro-step position, and OPEN Coil
   //First we might have to enable the motor outputs
@@ -104,7 +96,7 @@ void setup()
   Serial.print("OPEN Coil Y = ");
   Serial.println((SPItransmit(READ, SR0, 0) & B00000100)>>2);
 
-  //Next lets try setting the current limit higher
+  // Next lets try setting the current limit higher
   Serial.print("CUR = ");
   Serial.println((SPItransmit(READ, CR0, 0) & B00011111)>>0);  //print value from DIRCTRL
   SPIwriteParam(CUR, 10);  //write to DIRCTRL
@@ -114,13 +106,13 @@ void setup()
 
 void loop()
 {
-  //Now lets step the motor
+  // The NXT minimum high pulse width is 2 microseconds.
   digitalWrite(STEP, HIGH);
-  delay(1);
+  delayMicroseconds(3);
   digitalWrite(STEP, LOW);
-  delay(10);
+  delayMicroseconds(3);
 
-  //If we press the button again display the microstep
+  // If we press the button again display the microstep
   if(!buttonA.isPressed())
   {
     Serial.print("Micro-step position = ");
