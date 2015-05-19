@@ -7,6 +7,22 @@
 class AMIS30543Raw
 {
 public:
+
+    // Addresses of control and status registers.
+    enum regAddr
+    {
+        WR  = 0x0,
+        CR0 = 0x1,
+        CR1 = 0x2,
+        CR2 = 0x3,
+        CR3 = 0x9,
+        SR0 = 0x4,
+        SR1 = 0x5,
+        SR2 = 0x6,
+        SR3 = 0x7,
+        SR4 = 0xA,
+    };
+
     void init(uint8_t slaveSelectPin)
     {
         ssPin = slaveSelectPin;
@@ -106,44 +122,29 @@ private:
     uint8_t cr2;
     uint8_t cr3;
 
-    // Addresses of control and status registers.
-    enum regAddr
-    {
-        WR  = 0x0,
-        CR0 = 0x1,
-        CR1 = 0x2,
-        CR2 = 0x3,
-        CR3 = 0x9,
-        SR0 = 0x4,
-        SR1 = 0x5,
-        SR2 = 0x6,
-        SR3 = 0x7,
-        SR4 = 0xA,
-    };
-
     void writeWR()
     {
-        driver.writeReg(WR, wr);
+        driver.writeReg(AMIS30543Raw::WR, wr);
     }
 
     void writeCR0()
     {
-        driver.writeReg(CR0, cr0);
+        driver.writeReg(AMIS30543Raw::CR0, cr0);
     }
 
     void writeCR1()
     {
-        driver.writeReg(CR1, cr1);
+        driver.writeReg(AMIS30543Raw::CR1, cr1);
     }
 
     void writeCR2()
     {
-        driver.writeReg(CR2, cr2);
+        driver.writeReg(AMIS30543Raw::CR2, cr2);
     }
 
     void writeCR3()
     {
-        driver.writeReg(CR3, wr);
+        driver.writeReg(AMIS30543Raw::CR3, wr);
     }
 
     AMIS30543Raw driver;
