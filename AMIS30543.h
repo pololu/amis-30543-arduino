@@ -90,15 +90,6 @@ public:
         applySettings();
     }
 
-    void applySettings()
-    {
-        writeWR();
-        writeCR0();
-        writeCR1();
-        writeCR2();
-        writeCR3();
-    }
-
     void enableDriver()
     {
         cr2 |= 0b10000000;
@@ -153,6 +144,15 @@ private:
     uint8_t cr1;
     uint8_t cr2;
     uint8_t cr3;
+
+    void applySettings()
+    {
+        writeWR();
+        writeCR0();
+        writeCR1();
+        writeCR2();
+        writeCR3();
+    }
 
     void writeWR()
     {
