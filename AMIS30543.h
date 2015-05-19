@@ -86,6 +86,10 @@ public:
     void init(uint8_t slaveSelectPin)
     {
         driver.init(slaveSelectPin);
+    }
+
+    void resetSettings()
+    {
         wr = cr0 = cr1 = cr2 = cr3 = 0;
         applySettings();
     }
@@ -138,7 +142,7 @@ public:
         writeCR0();
     }
 
-private:
+protected:
     uint8_t wr;
     uint8_t cr0;
     uint8_t cr1;
