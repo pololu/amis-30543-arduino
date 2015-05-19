@@ -63,13 +63,13 @@ private:
     void selectChip()
     {
         digitalWrite(ssPin, LOW);
-        SPI.beginTransaction(settings);
+        //SPI.beginTransaction(settings);
     }
 
     void deselectChip()
     {
        digitalWrite(ssPin, HIGH);
-       SPI.endTransaction();
+       //SPI.endTransaction();
 
        // The CS high time is specified as 2.5 us in the
        // AMIS-30543 datasheet.
@@ -176,7 +176,7 @@ private:
 
     void writeCR3()
     {
-        driver.writeReg(AMIS30543Raw::CR3, wr);
+        driver.writeReg(AMIS30543Raw::CR3, cr3);
     }
 
     AMIS30543Raw driver;
