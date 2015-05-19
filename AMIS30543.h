@@ -47,13 +47,13 @@ private:
     void selectChip()
     {
         digitalWrite(ssPin, LOW);
-        SPI.beginTransaction(settings);
+        // TODO: SPI.beginTransaction(settings);
     }
 
     void deselectChip()
     {
        digitalWrite(ssPin, HIGH);
-       SPI.endTransaction();
+       // TODO: SPI.endTransaction();
 
        // The CS high time is specified as 2.5 us in the
        // AMIS-30543 datasheet.
