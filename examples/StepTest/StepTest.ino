@@ -3,6 +3,12 @@
 const uint8_t amisStepPin = 9;
 const uint8_t amisSlaveSelect = 10;
 const uint8_t amisClrPin = 11;
+const uint8_t scopeTriggerPin = 12;
+
+// Scope setup:
+// Channel 1: pin 12;
+// Channel 2: SLA
+// Channel 3: MOTXP
 
 #include <SPI.h>
 #include <AMIS30543.h>
@@ -39,26 +45,35 @@ void setup()
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
 
+  digitalWrite(scopeTriggerPin, LOW);
+  pinMode(scopeTriggerPin, OUTPUT);
+
+
   Serial.begin(9600);
   SPI.begin();
   pinMode(amisStepPin, OUTPUT);
   delay(1);
 
+  if(0){  //tmphax
   Serial.println(F("Press enter to start the test."));
   waitForSerial();
+  }
 
   stepper.init(amisSlaveSelect);
 
-  testResetSettings();
-  testEnableDisableDriver();
-  testCurrentLimit();
-  testSteppingAndReadingPosition();
-  testDirControl();
-  testNXTP();
-  testStepModes();
-  testSleep();
-
-  Serial.println(F("All automated tests passed."));
+  if (0)  //tmphax
+  {
+    // Automated tests.
+    testResetSettings();
+    testEnableDisableDriver();
+    testCurrentLimit();
+    testSteppingAndReadingPosition();
+    testDirControl();
+    testNXTP();
+    testStepModes();
+    testSleep();
+    Serial.println(F("All automated tests passed."));
+  }
 
   digitalWrite(13, HIGH); // Turn on the yellow LED.
 
@@ -150,7 +165,7 @@ void testCurrentLimit()
     Serial.println(F("setCurrentLimit(244) failed"));
   }
   stepper.setCurrentMilliamps(3000);
-  if (readCUR() != 0b11010)
+  if (readCUR() != 0b11001)
   {
     Serial.println(F("setCurrentLimit(3000) failed"));
   }
@@ -336,13 +351,38 @@ void testWithScope()
 
   resetDriver();
   stepper.setStepMode(4);
-  stepper.setCurrentMilliamps(0);
+  stepper.setCurrentMilliamps(500);
   stepper.enableDriver();
 
   while(1)
   {
+    digitalWrite(scopeTriggerPin, HIGH);
+    delayMicroseconds(100);
+    digitalWrite(scopeTriggerPin, LOW);
+    delayMicroseconds(10);
+
+    // First step:
+    // Verify that the PWM frequency seen on the motor output
+    // is doubled (50 kHz).
+    stepper.setPwmFrequencyDouble();
     nextStep();
     delay(1);
+
+    // Second step:
+    // Verify that the PWM frequency seen on the motor output
+    // is normal (25 kHz).
+    stepper.setPwmFrequencyDefault();
+    nextStep();
+    delay(1);
+
+    nextStep();
+    delay(1);
+
+    for (uint8_t i = 0; i < 29; i++)
+    {
+      nextStep();
+      delay(1);
+    }
   }
 }
 

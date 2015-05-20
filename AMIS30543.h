@@ -274,6 +274,21 @@ public:
         writeCR1();
     }
 
+    /*! Sets the PWMF bit to 1, which doubles the PWM frequency (45.6 kHz) .*/
+    void setPwmFrequencyDouble()
+    {
+        cr1 |= (1 << 3);
+        writeCR1();
+    }
+
+    /*! Clears the PWMF bit, which sets the PWM frequency to its default value
+     *  (22.8 kHz). */
+    void setPwmFrequencyDefault()
+    {
+        cr1 &= ~(1 << 3);
+        writeCR1();
+    }
+
 protected:
 
     uint8_t wr;
