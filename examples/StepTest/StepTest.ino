@@ -376,8 +376,18 @@ void testWithScope()
     // seconds, for a total of 4 different settings.
     stepper.setPwmSlope(m);
 
-    stepper.setSlaGain(m & 1);
-    stepper.setSlaTransparency(m & 2);
+    // Verify that the SLA gain changes every two seconds.
+    // (The two settings are 0.5 and 0.25.)
+    if (m & 1)
+    {
+      stepper.setSlaGainHalf();
+    }
+    else
+    {
+      stepper.setSlaGainDefault();
+    }
+    
+    //stepper.setSlaTransparency(m & 2);
 
     cli();
     digitalWrite(scopeTriggerPin, HIGH);

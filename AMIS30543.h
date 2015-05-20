@@ -315,6 +315,22 @@ public:
         writeCR1();
     }
 
+    /*! Clears the SLAG bit, which configures the signal on SLA pin to have a
+     *  gain of 0.5 (the default). */
+    void setSlaGainDefault()
+    {
+        cr2 &= ~(1 << 5);
+        writeCR2();
+    }
+
+    /*! Sets the SLAG bit to 1, which configures the signal on SLA pin to have a
+     *  gain of 0.25 (half of the default). */
+    void setSlaGainHalf()
+    {
+        cr2 |= (1 << 5);
+        writeCR2();
+    }
+
 protected:
 
     uint8_t wr;
