@@ -221,13 +221,13 @@ public:
         {
         case MicroStep32: sm = 0b000; break;
         case MicroStep16: sm = 0b001; break;
-        case MicroStep8:  sm = 0b010; break;
-        case MicroStep4:  sm = 0b011; break;
+        case MicroStep8: sm = 0b010; break;
+        case MicroStep4: sm = 0b011; break;
         case CompensatedHalf: sm = 0b100; break; /* a.k.a. MicroStep2 */
         case UncompensatedHalf: sm = 0b101; break;
         case UncompensatedFull: sm = 0b110; break;
         case MicroStep128: esm = 0b001; break;
-        case MicroStep64:  esm = 0b010; break;
+        case MicroStep64: esm = 0b010; break;
         case CompensatedFullTwoPhaseOn: esm = 0b011; break;  /* a.k.a. MicroStep 1 */
         case CompensatedFullOnePhaseOn: esm = 0b100; break;
         }
@@ -238,7 +238,9 @@ public:
         writeCR3();
     }
 
-    /*! Sets the SLP bit 1, enabling sleep mode. */
+    /*! Sets the SLP bit 1, enabling sleep mode.
+     *
+     * You can call sleepStop() to disable sleep mode. */
     void sleep()
     {
         cr2 |= (1 << 6);
