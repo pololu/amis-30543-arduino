@@ -153,7 +153,11 @@ public:
      * The lower two bits of this return value might be inaccurate if the step
      * pin is being toggled while this function runs (e.g. from an interrupt or
      * a PWM signal).
-     */
+     *
+     * Our tests indicated that the return value of this function might be wrong
+     * if you read it within 25 microseconds of commanding the driver to take a
+     * step.  Therefore we recommend delaying for at least 100 microseconds after
+     * taking a step and before calling this function. */
     uint16_t readPosition()
     {
         uint8_t sr3 = readStatusReg(AMIS30543Raw::SR3);
@@ -177,6 +181,23 @@ public:
         {
             cr1 &= ~0x80;
         }
+        writeCR1();
+    }
+
+    /*! Sets the value of the NXTP configuration bit to 0, which means that new
+     * steps are triggered by a rising edge on the NXT/STEP pin.  This is the
+     * default behavior. */
+    void stepOnRisingEdge()
+    {
+        cr1 &= ~0b01000000;
+        writeCR1();
+    }
+
+    /*! Sets the value of the NXTP configuration bit to 1, which means that new
+     * steps are triggered by a falling edge on the NXT/STEP pin. */
+    void stepOnFallingEdge()
+    {
+        cr1 |= 0b01000000;
         writeCR1();
     }
 

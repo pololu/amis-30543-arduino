@@ -21,6 +21,15 @@ const uint8_t amisStepPin = 9;
 const uint8_t amisSlaveSelect = 10;
 const uint8_t amisClrPin = 11;
 
+// When developing theses tests for the AMIS-30543, we found
+// that a delay of 15 microseconds between changing NXT and
+// reading the microstepping position was too short (resulting in
+// getting the old microstepping position instead of the new
+// one).  A delay of 25 microseconds seems to be sufficient.  This
+// isn't documented in the datasheet; the closest thing is
+// tNXT_HI, which is 2 microseconds.
+const uint16_t postStepDelayUs = 100;
+
 AMIS30543 stepper;
 
 void setup()
@@ -40,14 +49,12 @@ void setup()
   stepper.init(amisSlaveSelect);
 
   testResetSettings();
-  testEnableDriver();
+  testEnableDisableDriver();
   testSteppingAndReadingPosition();
   testDirControl();
+  testNXTP();
 
   success();
-  stepper.resetSettings();
-  stepper.setCurrentMilliamps(500);
-  stepper.enableDriver();
 }
 
 void loop()
@@ -102,13 +109,19 @@ void testResetSettings()
   }
 }
 
-void testEnableDriver()
+void testEnableDisableDriver()
 {
   resetDriver();
   stepper.enableDriver();
   if (stepper.driver.readReg(CR2) != 0x80)
   {
     Serial.println(F("Error: EnableDriver failed."));
+    error();
+  }
+  stepper.disableDriver();
+  if (stepper.driver.readReg(CR2) != 0x00)
+  {
+    Serial.println(F("Error: DisableDriver failed."));
     error();
   }
 }
@@ -128,7 +141,7 @@ void testSteppingAndReadingPosition()
 
   if (pos0 != 0 || pos1 != 4 || pos2 != 8)
   {
-    Serial.println(F("Microstep positions are wrong."));
+    Serial.println(F("ReadPosition: Microstep positions are wrong."));
     Serial.println(pos0);
     Serial.println(pos1);
     Serial.println(pos2);
@@ -152,6 +165,40 @@ void testDirControl()
     Serial.println(F("DIRCTRL: Microstep positions are wrong."));
     Serial.println(pos0);
     Serial.println(pos1);
+    error();
+  }
+}
+
+void testNXTP()
+{
+  resetDriver();
+  stepper.enableDriver();
+
+  digitalWrite(amisStepPin, HIGH);
+  delayMicroseconds(postStepDelayUs);
+  uint16_t pos0 = stepper.readPosition();
+
+  stepper.stepOnFallingEdge();
+  digitalWrite(amisStepPin, LOW);
+  delayMicroseconds(postStepDelayUs);
+  uint16_t pos1 = stepper.readPosition();
+
+  stepper.stepOnRisingEdge();
+  digitalWrite(amisStepPin, HIGH);
+  delayMicroseconds(postStepDelayUs);
+  uint16_t pos2 = stepper.readPosition();
+
+  digitalWrite(amisStepPin, LOW);
+  delayMicroseconds(postStepDelayUs);
+  uint16_t pos3 = stepper.readPosition();
+
+  if (pos0 != 4 || pos1 != 8 || pos2 != 12 || pos3 != 12)
+  {
+    Serial.println(F("NXTP: Microstep positions are wrong."));
+    Serial.println(pos0);
+    Serial.println(pos1);
+    Serial.println(pos2);
+    Serial.println(pos3);
     error();
   }
 }
@@ -187,7 +234,7 @@ void nextStep()
   digitalWrite(amisStepPin, LOW);
   delayMicroseconds(3);
 
-  delay(1);
+  delayMicroseconds(postStepDelayUs);
 }
 
 // Wait for the user to send a newline character on the serial monitor.
