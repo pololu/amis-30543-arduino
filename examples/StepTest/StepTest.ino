@@ -21,13 +21,14 @@ const uint8_t amisStepPin = 9;
 const uint8_t amisSlaveSelect = 10;
 const uint8_t amisClrPin = 11;
 
-// When developing theses tests for the AMIS-30543, we found
-// that a delay of 15 microseconds between changing NXT and
-// reading the microstepping position was too short (resulting in
-// getting the old microstepping position instead of the new
-// one).  A delay of 25 microseconds seems to be sufficient.  This
-// isn't documented in the datasheet; the closest thing is
-// tNXT_HI, which is 2 microseconds.
+// When developing theses tests for the AMIS-30543, we found that
+// a delay of 15 microseconds between changing NXT and reading
+// the microstepping position was too short (resulting in getting
+// the old microstepping position instead of the new one).  A
+// delay of 25 microseconds seems to be sufficient.  This isn't
+// documented in the datasheet; the closest thing is tNXT_HI,
+// which is 2 microseconds, and a claim that "The translator
+// position is updated immediately following a NXT trigger."
 const uint16_t postStepDelayUs = 100;
 
 AMIS30543 stepper;
@@ -53,6 +54,7 @@ void setup()
   testSteppingAndReadingPosition();
   testDirControl();
   testNXTP();
+  testStepModes();
 
   success();
 }
@@ -199,6 +201,31 @@ void testNXTP()
     Serial.println(pos1);
     Serial.println(pos2);
     Serial.println(pos3);
+    error();
+  }
+}
+
+void testStepModes()
+{
+  resetDriver();
+  stepper.resetSettings();
+  stepper.enableDriver();
+
+  stepper.setStepMode(AMIS30543::MicroStep32);
+  nextStep();
+  uint16_t pos0 = stepper.readPosition();
+
+  stepper.setStepMode(16);
+  nextStep();
+  uint16_t pos1 = stepper.readPosition();
+
+  // TODO: finish testing all the different modes
+
+  if (pos0 != 4 || pos1 != 12)
+  {
+    Serial.println(F("SM: Microstep positions are wrong."));
+    Serial.println(pos0);
+    Serial.println(pos1);
     error();
   }
 }

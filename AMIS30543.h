@@ -82,6 +82,23 @@ class AMIS30543
 {
 public:
 
+    enum stepMode
+    {
+        MicroStep128 = 128,
+        MicroStep64 = 64,
+        MicroStep32 = 32,
+        MicroStep16 = 16,
+        MicroStep8 = 8,
+        MicroStep4 = 4,
+        MicroStep2 = 2,
+        MicroStep1 = 1,
+        CompensatedHalf = MicroStep2,
+        CompensatedFullTwoPhaseOn = MicroStep1,
+        CompensatedFullOnePhaseOn = 200,
+        UncompensatedHalf = 201,
+        UncompensatedFull = 202,
+    };
+
     void init(uint8_t slaveSelectPin)
     {
         driver.init(slaveSelectPin);
@@ -182,6 +199,43 @@ public:
             cr1 &= ~0x80;
         }
         writeCR1();
+    }
+
+    /*! Configures the driver to have the specified stepping mode.
+     *
+     * This affects many things about the performance of the motor, including
+     * how much the output moves for each step taken and how much current flows
+     * through the coils in each stepping position.
+     *
+     * If an invalid stepping mode is passed to this function, then it selects
+     * 1/32 micro-step, which is the driver's default. */
+    void setStepMode(uint8_t mode)
+    {
+        // Pick 1/32 micro-step by default.
+        uint8_t esm = 0b000;
+        uint8_t sm = 0b000;
+
+        // The order of these cases matches the order in Table 12 of the
+        // AMIS-30543 datasheet.
+        switch(mode)
+        {
+        case MicroStep32: sm = 0b000; break;
+        case MicroStep16: sm = 0b001; break;
+        case MicroStep8:  sm = 0b010; break;
+        case MicroStep4:  sm = 0b011; break;
+        case CompensatedHalf: sm = 0b100; break; /* a.k.a. MicroStep2 */
+        case UncompensatedHalf: sm = 0b101; break;
+        case UncompensatedFull: sm = 0b110; break;
+        case MicroStep128: esm = 0b001; break;
+        case MicroStep64:  esm = 0b010; break;
+        case CompensatedFullTwoPhaseOn: esm = 0b011; break;  /* a.k.a. MicroStep 1 */
+        case CompensatedFullOnePhaseOn: esm = 0b100; break;
+        }
+
+        cr0 = (cr0 & ~0b11100000) | (sm << 5);
+        cr3 = (cr3 & ~0b111) | esm;
+        writeCR0();
+        writeCR3();
     }
 
     /*! Sets the value of the NXTP configuration bit to 0, which means that new
