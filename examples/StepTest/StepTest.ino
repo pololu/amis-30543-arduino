@@ -428,6 +428,7 @@ void testWithScope()
 
         if (stepper.verifySettings())
         {
+          // TODO: fix the  API so this part really works
           Serial.println(F("Successfully reapplied settings."));
         }
         else

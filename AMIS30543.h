@@ -140,11 +140,17 @@ public:
      * back into the desired state. */
     void applySettings()
     {
+        // Because of power interruption considerations, the register that
+        // contains the MOTEN bit (CR2) must be written first, and whenever we
+        // write to it we should also write to all the other registers.
+
         // CR2 is written first, because it contains the MOTEN bit, and there is
         // a risk that there might be a power interruption to the driver right
         // before CR2 is written.  This could result in the motor being enabled
-        // with incorrect settings.
-        writeCR2();
+        // with incorrect settings.  Also, whenever we do write to CR2, we want to
+        // also write the other registers to make sure they are in the correct state.
+        driver.writeReg(AMIS30543Raw::CR2, cr2);
+
         writeWR();
         writeCR0();
         writeCR1();
@@ -154,13 +160,13 @@ public:
     void enableDriver()
     {
         cr2 |= 0b10000000;
-        writeCR2();
+        applySettings();
     }
 
     void disableDriver()
     {
         cr2 &= ~0b10000000;
-        writeCR2();
+        applySettings();
     }
 
     /*! Sets the per-coil current limit equal to the highest available setting
@@ -284,18 +290,22 @@ public:
      * According to the AMIS-30543 datasheet, the motor supply voltage must be
      * at least 9 V before entering sleep mode.
      *
-     * You can call sleepStop() to disable sleep mode. */
+     * You can call sleepStop() to disable sleep mode.
+     *
+     * Please read the note about this function in README.md. */
     void sleep()
     {
         cr2 |= (1 << 6);
-        writeCR2();
+        applySettings();
     }
 
-    /*! Sets the SLP bit 0, disabling sleep mode. */
+    /*! Sets the SLP bit 0, disabling sleep mode.
+     *
+     * Please read the note about this function in README.md. */
     void sleepStop()
     {
         cr2 &= ~(1 << 6);
-        writeCR2();
+        applySettings();
     }
 
     /*! Sets the value of the NXTP configuration bit to 0, which means that new
@@ -357,35 +367,43 @@ public:
     }
 
     /*! Clears the SLAG bit, which configures the signal on SLA pin to have a
-     *  gain of 0.5 (the default). */
+     *  gain of 0.5 (the default).
+     *
+     * Please read the note about this function in README.md. */
     void setSlaGainDefault()
     {
         cr2 &= ~(1 << 5);
-        writeCR2();
+        applySettings();
     }
 
     /*! Sets the SLAG bit to 1, which configures the signal on SLA pin to have a
-     *  gain of 0.25 (half of the default). */
+     *  gain of 0.25 (half of the default).
+     *
+     * Please read the note about this function in README.md. */
     void setSlaGainHalf()
     {
         cr2 |= (1 << 5);
-        writeCR2();
+        applySettings();
     }
 
     /*! Set the SLAT bit to 0 (the default), which disables transparency on the
-     *  SLA pin.  See the AMIS-30543 datasheet for more information. */
+     *  SLA pin.  See the AMIS-30543 datasheet for more information.
+     *
+     * Please read the note about this function in README.md. */
     void setSlaTransparencyOff()
     {
         cr2 &= ~(1 << 4);
-        writeCR2();
+        applySettings();
     }
 
     /*! Sets the SLAT bit to 1, which enables transparency on the SLA pin.
-     *  See the AMIS-30543 datasheet for more information. */
+     *  See the AMIS-30543 datasheet for more information.
+     *
+     * Please read the note about this function in README.md. */
     void setSlaTransparencyOn()
     {
         cr2 |= (1 << 4);
-        writeCR2();
+        applySettings();
     }
 
 protected:
@@ -417,11 +435,6 @@ protected:
     void writeCR1()
     {
         driver.writeReg(AMIS30543Raw::CR1, cr1);
-    }
-
-    void writeCR2()
-    {
-        driver.writeReg(AMIS30543Raw::CR2, cr2);
     }
 
     void writeCR3()
