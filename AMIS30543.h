@@ -110,6 +110,43 @@ public:
         applySettings();
     }
 
+    /*! Reads back all the SPI control registers from the device and
+     * verifies that they are equal to the cached copies stored in this class.
+     *
+     * This can be used to verify that the driver is powered on and has not lost
+     * them due to a power failure.  However this function will probably return
+     * true if the driver is not powered and all of the cached settings are the
+     * default values.  Therefore, we only recommend calling this after you have
+     * changed at least one of the settings from its default value, for example
+     * by calling enableDriver().
+     *
+     * @return 1 if the settings from the device match the cached copies, 0 if
+     * they do not. */
+    bool verifySettings()
+    {
+        return driver.readReg(AMIS30543Raw::WR) == wr &&
+            driver.readReg(AMIS30543Raw::CR0) == cr0 &&
+            driver.readReg(AMIS30543Raw::CR1) == cr1 &&
+            driver.readReg(AMIS30543Raw::CR2) == cr2 &&
+            driver.readReg(AMIS30543Raw::CR3) == cr3;
+    }
+
+    /*! Re-writes the cached settings stored in this class to the device.
+     *
+     * You should not normally need to call this function because settings are
+     * written to the device whenever they are changed.  However, if
+     * verifySettings() returns false (due to a power interruption, for
+     * instance), then you could use applySettings to get the device's settings
+     * back into the desired state..  */
+    void applySettings()
+    {
+        writeWR();
+        writeCR0();
+        writeCR1();
+        writeCR2();
+        writeCR3();
+    }
+
     void enableDriver()
     {
         cr2 |= 0b10000000;
@@ -354,15 +391,6 @@ protected:
     uint8_t cr1;
     uint8_t cr2;
     uint8_t cr3;
-
-    void applySettings()
-    {
-        writeWR();
-        writeCR0();
-        writeCR1();
-        writeCR2();
-        writeCR3();
-    }
 
     uint8_t readStatusReg(uint8_t address)
     {

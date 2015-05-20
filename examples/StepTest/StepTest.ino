@@ -64,6 +64,7 @@ void setup()
 
     // Automated tests.
     testResetSettings();
+    testVerifySettings();
     testEnableDisableDriver();
     testCurrentLimit();
     testSteppingAndReadingPosition();
@@ -131,6 +132,26 @@ void testResetSettings()
   }
 }
 
+void testVerifySettings()
+{
+  resetDriver();
+
+  if (!stepper.verifySettings())
+  {
+    Serial.println(F("Failed to verify empty settings."));
+    error();
+  }
+
+  writeReg(WR, 0x20);
+
+  if (stepper.verifySettings())
+  {
+    Serial.println(F("verifySettings failed to detect that a register changed."));
+    error();
+  }
+}
+
+
 void testEnableDisableDriver()
 {
   resetDriver();
@@ -174,8 +195,6 @@ void testSteppingAndReadingPosition()
 {
   resetDriver();
   stepper.enableDriver();
-
-  Serial.println(F("Test readPosition"));
 
   uint16_t pos0 = stepper.readPosition();
   nextStep();
@@ -366,35 +385,55 @@ void testWithScope()
 
   while(1)
   {
-    uint8_t m = count >> 6 & 3;
+    static uint8_t lastMode = 0xFF;
+    uint8_t mode = count >> 6 & 3;
 
-    // By triggering on channel 3 and zooming in to 100 ns/div,
-    // verify that the PWM fall (or rise) time increases every 2
-    // seconds, for a total of 4 different settings.
-    stepper.setPwmSlope(m);
+    if (lastMode != mode)
+    {
+      lastMode = mode;
 
-    // Verify that the SLA gain changes every two seconds.
-    // (The two settings are 0.5 and 0.25.)
-    if (m & 1)
-    {
-      stepper.setSlaGainHalf();
-    }
-    else
-    {
-      stepper.setSlaGainDefault();
-    }
+      // By triggering on channel 3 and zooming in to 100 ns/div,
+      // verify that the PWM fall (or rise) time increases every 2
+      // seconds, for a total of 4 different settings.
+      //stepper.setPwmSlope(m);
 
-    // Verify that the SLA transparency setting changes every 4 seconds.
-    if (m & 2)
-    {
-      stepper.setSlaTransparencyOn();
-    }
-    else
-    {
-      stepper.setSlaTransparencyOff();
+      // Verify that the SLA gain changes every two seconds.
+      // (The two settings are 0.5 and 0.25.)
+      if (mode & 1)
+      {
+        stepper.setSlaGainHalf();
+      }
+      else
+      {
+        stepper.setSlaGainDefault();
+      }
+
+      // Verify that the SLA transparency setting changes every 4 seconds.
+      if (mode & 2)
+      {
+        stepper.setSlaTransparencyOn();
+      }
+      else
+      {
+        stepper.setSlaTransparencyOff();
+      }
+
+      // Verify that the system can recover nicely from an
+      // interruption to stepper motor power.  (It will have a lag of
+      // 0-2 seconds because we only do this check every 2 seconds.)
+      if (!stepper.verifySettings())
+      {
+        stepper.applySettings();
+
+        if (stepper.verifySettings())
+        {
+          Serial.println(F("Recovered from power failure."));
+        }
+      }
     }
 
     cli();
+
     digitalWrite(scopeTriggerPin, HIGH);
     delayMicroseconds(100);
     digitalWrite(scopeTriggerPin, LOW);
@@ -414,16 +453,10 @@ void testWithScope()
     nextStep();
     delay(1);
 
-    nextStep();
-    delay(1);
-
-    nextStep();
-    delay(1);
-
     sei();
 
     // Get back to the starting position.
-    for (uint8_t i = 0; i < 28; i++)
+    for (uint8_t i = 0; i < 30; i++)
     {
       nextStep();
       delay(1);
