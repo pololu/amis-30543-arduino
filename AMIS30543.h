@@ -137,13 +137,17 @@ public:
      * written to the device whenever they are changed.  However, if
      * verifySettings() returns false (due to a power interruption, for
      * instance), then you could use applySettings to get the device's settings
-     * back into the desired state..  */
+     * back into the desired state. */
     void applySettings()
     {
+        // CR2 is written first, because it contains the MOTEN bit, and there is
+        // a risk that there might be a power interruption to the driver right
+        // before CR2 is written.  This could result in the motor being enabled
+        // with incorrect settings.
+        writeCR2();
         writeWR();
         writeCR0();
         writeCR1();
-        writeCR2();
         writeCR3();
     }
 

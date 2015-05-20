@@ -421,13 +421,18 @@ void testWithScope()
       // Verify that the system can recover nicely from an
       // interruption to stepper motor power.  (It will have a lag of
       // 0-2 seconds because we only do this check every 2 seconds.)
+      // TODO: make AutoRecover example that shows how to do this
       if (!stepper.verifySettings())
       {
         stepper.applySettings();
 
         if (stepper.verifySettings())
         {
-          Serial.println(F("Recovered from power failure."));
+          Serial.println(F("Successfully reapplied settings."));
+        }
+        else
+        {
+          Serial.println(F("Could not verify settings; driver power might be off."));
         }
       }
     }
