@@ -240,6 +240,9 @@ public:
 
     /*! Sets the SLP bit 1, enabling sleep mode.
      *
+     * According to the AMIS-30543 datasheet, the motor supply voltage must be
+     * at least 9 V before entering sleep mode.
+     *
      * You can call sleepStop() to disable sleep mode. */
     void sleep()
     {
@@ -272,6 +275,7 @@ public:
     }
 
 protected:
+
     uint8_t wr;
     uint8_t cr0;
     uint8_t cr1;

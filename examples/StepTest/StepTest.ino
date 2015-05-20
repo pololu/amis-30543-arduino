@@ -1,5 +1,9 @@
 /* This code is used to test all of the features of the library. */
 
+const uint8_t amisStepPin = 9;
+const uint8_t amisSlaveSelect = 10;
+const uint8_t amisClrPin = 11;
+
 #include <SPI.h>
 #include <AMIS30543.h>
 
@@ -16,10 +20,6 @@ enum regAddr
   SR3 = 0x7,
   SR4 = 0xA,
 };
-
-const uint8_t amisStepPin = 9;
-const uint8_t amisSlaveSelect = 10;
-const uint8_t amisClrPin = 11;
 
 // When developing theses tests for the AMIS-30543, we found that
 // a delay of 15 microseconds between changing NXT and reading
@@ -51,13 +51,18 @@ void setup()
 
   testResetSettings();
   testEnableDisableDriver();
+  testCurrentLimit();
   testSteppingAndReadingPosition();
   testDirControl();
   testNXTP();
   testStepModes();
   testSleep();
 
-  success();
+  Serial.println(F("All automated tests passed."));
+
+  digitalWrite(13, HIGH); // Turn on the yellow LED.
+
+  testWithScope();
 }
 
 void loop()
@@ -126,6 +131,28 @@ void testEnableDisableDriver()
   {
     Serial.println(F("Error: DisableDriver failed."));
     error();
+  }
+}
+
+void testCurrentLimit()
+{
+  resetDriver();
+
+  stepper.setCurrentMilliamps(800);
+  if (readCUR() != 0b01010)
+  {
+    Serial.println(F("setCurrentLimit(800) failed"));
+  }
+
+  stepper.setCurrentMilliamps(244);
+  if (readCUR() != 0b00000)
+  {
+    Serial.println(F("setCurrentLimit(244) failed"));
+  }
+  stepper.setCurrentMilliamps(3000);
+  if (readCUR() != 0b11010)
+  {
+    Serial.println(F("setCurrentLimit(3000) failed"));
   }
 }
 
@@ -303,6 +330,22 @@ void testSleep()
   }
 }
 
+void testWithScope()
+{
+  Serial.println(F("Check oscilloscope."));
+
+  resetDriver();
+  stepper.setStepMode(4);
+  stepper.setCurrentMilliamps(0);
+  stepper.enableDriver();
+
+  while(1)
+  {
+    nextStep();
+    delay(1);
+  }
+}
+
 void writeReg(uint8_t address, uint8_t value)
 {
   stepper.driver.writeReg(address, value);
@@ -316,6 +359,11 @@ uint8_t readReg(uint8_t address)
 uint8_t readStatusReg(uint8_t address)
 {
   return readReg(address) & 0x7F;
+}
+
+uint8_t readCUR()
+{
+  return readReg(CR0) & 0b11111;
 }
 
 void resetDriver()
@@ -342,27 +390,19 @@ void nextStep()
 // Wait for the user to send a newline character on the serial monitor.
 void waitForSerial()
 {
-    while(true)
+  while(true)
+  {
+    if (Serial.available() && Serial.read() == '\n')
     {
-        if (Serial.available() && Serial.read() == '\n')
-        {
-            break;
-        }
+      break;
     }
-}
-
-void success()
-{
-    Serial.println("All tests passed.");
-    digitalWrite(13, HIGH);
-    while(1)
-    {
-    }
+  }
 }
 
 void error()
 {
-    while(1)
-    {
-    }
+  stepper.disableDriver();
+  while(1)
+  {
+  }
 }
