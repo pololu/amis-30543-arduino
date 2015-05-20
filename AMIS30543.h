@@ -289,6 +289,23 @@ public:
         writeCR1();
     }
 
+    /*! Sets the PWMJ bit, which enables artificial jittering in the PWM signal
+     *  used to control the current to each coil. */
+    void setPwmJitterOn()
+    {
+        cr1 |= (1 << 2);
+        writeCR1();
+    }
+
+    /*! Clears the PWMJ bit, which disables artificial jittering in the PWM
+     *  signal used to control the current to each coil.  This is the default
+     *  setting. */
+    void setPwmJitterOff()
+    {
+        cr1 &= ~(1 << 2);
+        writeCR1();
+    }
+
 protected:
 
     uint8_t wr;

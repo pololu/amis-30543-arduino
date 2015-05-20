@@ -354,8 +354,18 @@ void testWithScope()
   stepper.setCurrentMilliamps(500);
   stepper.enableDriver();
 
+  // NOTE: We can't really test setPwmJitterOn and
+  // setPwmJitterOff here.  We could have a second mode where you
+  // would have to set the scope to trigger on the motor channel,
+  // leave it at a constant current, and turn the jitter feature
+  // on and off every second or something.  Here we only make
+  // sure they can compile and they don't break anything.
+  stepper.setPwmJitterOn();
+  stepper.setPwmJitterOff();
+
   while(1)
   {
+    cli();
     digitalWrite(scopeTriggerPin, HIGH);
     delayMicroseconds(100);
     digitalWrite(scopeTriggerPin, LOW);
@@ -378,7 +388,12 @@ void testWithScope()
     nextStep();
     delay(1);
 
-    for (uint8_t i = 0; i < 29; i++)
+    nextStep();
+    delay(1);
+
+    sei();
+
+    for (uint8_t i = 0; i < 28; i++)
     {
       nextStep();
       delay(1);
