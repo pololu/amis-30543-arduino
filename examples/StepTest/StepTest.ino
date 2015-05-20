@@ -5,6 +5,8 @@ const uint8_t amisSlaveSelect = 10;
 const uint8_t amisClrPin = 11;
 const uint8_t scopeTriggerPin = 12;
 
+// Power supply: 10 V, 1 A
+
 // Scope setup:
 // Channel 1: pin 12;
 // Channel 2: SLA
@@ -363,8 +365,20 @@ void testWithScope()
   stepper.setPwmJitterOn();
   stepper.setPwmJitterOff();
 
+  uint8_t count = 0;
+
   while(1)
   {
+    uint8_t m = count >> 6 & 3;
+
+    // By triggering on channel 3 and zooming in to 100 ns/div,
+    // verify that the PWM fall (or rise) time increases every 2
+    // seconds, for a total of 4 different settings.
+    stepper.setPwmSlope(m);
+
+    stepper.setSlaGain(m & 1);
+    stepper.setSlaTransparency(m & 2);
+
     cli();
     digitalWrite(scopeTriggerPin, HIGH);
     delayMicroseconds(100);
@@ -393,11 +407,14 @@ void testWithScope()
 
     sei();
 
+    // Get back to the starting position.
     for (uint8_t i = 0; i < 28; i++)
     {
       nextStep();
       delay(1);
     }
+
+    count++;
   }
 }
 

@@ -306,6 +306,15 @@ public:
         writeCR1();
     }
 
+    /*! This sets the EMC[1:0] bits, which determine how long it takes the PWM
+     *  signal to rise or fall.  Valid values are 0 through 3.  Higher values
+     *  correspond to longer rise and fall times.  **/
+    void setPwmSlope(uint8_t emc)
+    {
+        cr1 = (cr1 & ~0b11) | (emc & 0b11);
+        writeCR1();
+    }
+
 protected:
 
     uint8_t wr;
