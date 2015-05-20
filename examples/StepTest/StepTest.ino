@@ -12,6 +12,8 @@ const uint8_t scopeTriggerPin = 12;
 // Channel 2: SLA
 // Channel 3: MOTXP
 
+const bool skipAutoTests = false;
+
 #include <SPI.h>
 #include <AMIS30543.h>
 
@@ -50,21 +52,16 @@ void setup()
   digitalWrite(scopeTriggerPin, LOW);
   pinMode(scopeTriggerPin, OUTPUT);
 
-
   Serial.begin(9600);
   SPI.begin();
   pinMode(amisStepPin, OUTPUT);
-  delay(1);
-
-  if(0){  //tmphax
-  Serial.println(F("Press enter to start the test."));
-  waitForSerial();
-  }
-
   stepper.init(amisSlaveSelect);
 
-  if (0)  //tmphax
+  if (!skipAutoTests)
   {
+    Serial.println(F("Press enter to start the test."));
+    waitForSerial();
+
     // Automated tests.
     testResetSettings();
     testEnableDisableDriver();
