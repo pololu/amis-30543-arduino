@@ -238,6 +238,20 @@ public:
         writeCR3();
     }
 
+    /*! Sets the SLP bit 1, enabling sleep mode. */
+    void sleep()
+    {
+        cr2 |= (1 << 6);
+        writeCR2();
+    }
+
+    /*! Sets the SLP bit 0, disabling sleep mode. */
+    void sleepStop()
+    {
+        cr2 &= ~(1 << 6);
+        writeCR2();
+    }
+
     /*! Sets the value of the NXTP configuration bit to 0, which means that new
      * steps are triggered by a rising edge on the NXT/STEP pin.  This is the
      * default behavior. */

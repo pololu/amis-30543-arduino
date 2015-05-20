@@ -55,6 +55,7 @@ void setup()
   testDirControl();
   testNXTP();
   testStepModes();
+  testSleep();
 
   success();
 }
@@ -268,6 +269,40 @@ void testStepModes()
   }
 }
 
+void testSleep()
+{
+  resetDriver();
+  stepper.enableDriver();
+
+  stepper.sleep();
+  uint8_t cr2 = readReg(CR2);
+  if (cr2 != 0xC0)
+  {
+    Serial.println("sleepStart failed: bad CR2 value.");
+    Serial.println(cr2, HEX);
+    stepper.resetSettings();  // avoid getting stuck in sleep mode
+    error();
+  }
+
+  delay(1);
+  // Driving CLR high does nothing because of sleep mode,
+  // so MOTEN will stay set.
+  digitalWrite(amisClrPin, HIGH);
+  delay(1);
+  digitalWrite(amisClrPin, LOW);
+  delay(1);
+
+  stepper.sleepStop();
+  cr2 = readReg(CR2);
+  if (cr2 != 0x80)
+  {
+    Serial.println("sleepStop failed: bad CR2 value.");
+    Serial.println(cr2, HEX);
+    stepper.resetSettings();  // avoid getting stuck in sleep mode
+    error();
+  }
+}
+
 void writeReg(uint8_t address, uint8_t value)
 {
   stepper.driver.writeReg(address, value);
@@ -288,6 +323,8 @@ void resetDriver()
   digitalWrite(amisClrPin, HIGH);
   delay(1);
   digitalWrite(amisClrPin, LOW);
+  delay(1);
+  stepper.resetSettings();
   delay(1);
 }
 
