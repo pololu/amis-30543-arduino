@@ -331,6 +331,22 @@ public:
         writeCR2();
     }
 
+    /*! Set the SLAT bit to 0 (the default), which disables transparency on the
+     *  SLA pin.  See the AMIS-30543 datasheet for more information. */
+    void setSlaTransparencyOff()
+    {
+        cr2 &= ~(1 << 4);
+        writeCR2();
+    }
+
+    /*! Sets the SLAT bit to 1, which enables transparency on the SLA pin.
+     *  See the AMIS-30543 datasheet for more information. */
+    void setSlaTransparencyOn()
+    {
+        cr2 |= (1 << 4);
+        writeCR2();
+    }
+
 protected:
 
     uint8_t wr;

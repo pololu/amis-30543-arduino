@@ -386,8 +386,16 @@ void testWithScope()
     {
       stepper.setSlaGainDefault();
     }
-    
-    //stepper.setSlaTransparency(m & 2);
+
+    // Verify that the SLA transparency setting changes every 4 seconds.
+    if (m & 2)
+    {
+      stepper.setSlaTransparencyOn();
+    }
+    else
+    {
+      stepper.setSlaTransparencyOff();
+    }
 
     cli();
     digitalWrite(scopeTriggerPin, HIGH);
