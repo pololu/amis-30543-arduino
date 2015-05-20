@@ -207,25 +207,63 @@ void testNXTP()
 
 void testStepModes()
 {
+  uint16_t pos[12];
+
+  // Note: This test is not good enough to discern any differences between
+  // the 3 different full-step modes or the 2 different half-step modes.
+
   resetDriver();
   stepper.resetSettings();
   stepper.enableDriver();
 
   stepper.setStepMode(AMIS30543::MicroStep32);
-  nextStep();
-  uint16_t pos0 = stepper.readPosition();
+  nextStep(); pos[0] = stepper.readPosition();
 
   stepper.setStepMode(16);
-  nextStep();
-  uint16_t pos1 = stepper.readPosition();
+  nextStep(); pos[1] = stepper.readPosition();
 
-  // TODO: finish testing all the different modes
+  stepper.setStepMode(8);
+  nextStep(); pos[2] = stepper.readPosition();
 
-  if (pos0 != 4 || pos1 != 12)
+  stepper.setStepMode(4);
+  nextStep(); pos[3] = stepper.readPosition();
+
+  stepper.setStepMode(AMIS30543::CompensatedHalf);
+  nextStep(); pos[4] = stepper.readPosition();
+
+  stepper.setStepMode(AMIS30543::CompensatedFullTwoPhaseOn);
+  nextStep(); pos[5] = stepper.readPosition();
+  nextStep(); pos[6] = stepper.readPosition();
+  // This is kind of a contradiction; it's in "two-phase on"
+  // mode right now but one of the coils will be pretty much off.
+
+  stepper.setStepMode(AMIS30543::UncompensatedHalf);
+  nextStep(); pos[7] = stepper.readPosition();
+
+  stepper.setStepMode(AMIS30543::CompensatedFullOnePhaseOn);
+  nextStep(); pos[8] = stepper.readPosition();
+
+  stepper.setStepMode(128);
+  nextStep(); pos[9] = stepper.readPosition();
+
+  stepper.setStepMode(AMIS30543::UncompensatedFull);
+  nextStep(); pos[10] = stepper.readPosition();
+
+  stepper.setStepMode(64);
+  nextStep(); pos[11] = stepper.readPosition();
+
+  if (pos[0] != 4 || pos[1] != 12 || pos[2] != 28
+    || pos[3] != 60 || pos[4] != 124
+    || pos[5] != 252 || pos[6] != 380
+    || pos[7] != 444 || pos[8] != 60
+    || pos[9] != 61 || pos[10] != 189
+    || pos[11] != 191)
   {
     Serial.println(F("SM: Microstep positions are wrong."));
-    Serial.println(pos0);
-    Serial.println(pos1);
+    for(uint8_t i = 0; i < sizeof(pos)/sizeof(pos[0]); i++)
+    {
+      Serial.println(pos[i]);
+    }
     error();
   }
 }
