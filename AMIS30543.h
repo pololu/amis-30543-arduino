@@ -23,6 +23,24 @@ public:
         SR4 = 0xA,
     };
 
+    enum statusFlag
+    {
+        OPENY = (1 << 0),
+        OPENX = (1 << 1),
+        WD = (1 << 2),
+        CPFAIL = (1 << 3),
+        TW = (1 << 4),
+        OVCXNB = (1 << 5),
+        OVCXNT = (1 << 6),
+        OVCXPB = (1 << 7),
+        OVCXPT = (1 << 8),
+        TSD = (1 << 9),
+        OVCYNB = (1 << 10),
+        OVCYNT = (1 << 11),
+        OVCYPB = (1 << 12),
+        OVCYPT = (1 << 13),
+    };
+
     void init(uint8_t slaveSelectPin)
     {
         ssPin = slaveSelectPin;
@@ -406,13 +424,39 @@ public:
         applySettings();
     }
 
+    /*! Reads the status flags from registers SR0, SR1, and SR2.
+     *
+     * The return value is a 16-bit unsigned integer that has one bit for each
+     * status flag.  You can simply compare the return value to 0 to see if any
+     * of the status flags are set, or you can use the logical and operator (`&`)
+     * and the statusFlag enum to check individual flags.
+     *
+     * ~~~~{.cpp}
+     * uint16_t flags = stepper.readStatusFlags();
+     * if (flags)
+     * {
+     *   // At least one flag is set.
+     *
+     *   if (flags & AMIS3054::TSD)
+     *   {
+     *     // Thermal shutdown flag is set.
+     *   }
+     *
+     * }
+     * ~~~~
+     */
+    uint16_t readStatusFlags()
+    {
+        uint8_t sr0 = readStatusReg(AMIS30543Raw::SR0);
+        uint8_t sr1 = readStatusReg(AMIS30543Raw::SR1);
+        uint8_t sr2 = readStatusReg(AMIS30543Raw::SR2);
+
+        return ((sr0 & 0x7C) >> 2) | ((sr1 & 0x78) << 2) | ((sr2 & 0x7C) << 7);
+    }
+
 protected:
 
-    uint8_t wr;
-    uint8_t cr0;
-    uint8_t cr1;
-    uint8_t cr2;
-    uint8_t cr3;
+    uint8_t wr, cr0, cr1, cr2, cr3;
 
     uint8_t readStatusReg(uint8_t address)
     {

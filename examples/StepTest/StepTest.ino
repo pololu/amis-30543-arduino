@@ -65,6 +65,7 @@ void setup()
     // Automated tests.
     testResetSettings();
     testVerifySettings();
+    testReadStatusFlags();
     testEnableDisableDriver();
     testCurrentLimit();
     testSteppingAndReadingPosition();
@@ -148,6 +149,18 @@ void testVerifySettings()
   {
     Serial.println(F("verifySettings failed to detect that a register changed."));
     error();
+  }
+}
+
+void testReadStatusFlags()
+{
+  resetDriver();
+
+  uint16_t flags = stepper.readStatusFlags();
+
+  if (flags)
+  {
+    Serial.println(F("A status flag was set."));
   }
 }
 
