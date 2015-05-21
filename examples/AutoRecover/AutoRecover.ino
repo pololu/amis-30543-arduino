@@ -30,7 +30,7 @@ void setup()
 
   stepper.init(amisSlaveSelect);
   stepper.resetSettings();
-  stepper.setCurrentMilliamps(500);
+  stepper.setCurrentMilliamps(245);
   stepper.enableDriver();
 }
 
