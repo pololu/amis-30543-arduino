@@ -4,24 +4,9 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-class AMIS30543Raw  // TODO: rename to AMIS30543SPI
+class AMIS30543SPI
 {
 public:
-
-    // Addresses of control and status registers.  // TODO: move to AMIS30543
-    enum regAddr
-    {
-        WR  = 0x0,
-        CR0 = 0x1,
-        CR1 = 0x2,
-        CR2 = 0x3,
-        CR3 = 0x9,
-        SR0 = 0x4,
-        SR1 = 0x5,
-        SR2 = 0x6,
-        SR3 = 0x7,
-        SR4 = 0xA,
-    };
 
     void init(uint8_t slaveSelectPin)
     {
@@ -117,6 +102,21 @@ public:
         OVCYPT = (1 << 13),
     };
 
+    // Addresses of control and status registers.
+    enum regAddr
+    {
+        WR  = 0x0,
+        CR0 = 0x1,
+        CR1 = 0x2,
+        CR2 = 0x3,
+        CR3 = 0x9,
+        SR0 = 0x4,
+        SR1 = 0x5,
+        SR2 = 0x6,
+        SR3 = 0x7,
+        SR4 = 0xA,
+    };
+
     void init(uint8_t slaveSelectPin)
     {
         driver.init(slaveSelectPin);
@@ -142,11 +142,11 @@ public:
      * they do not. */
     bool verifySettings()
     {
-        return driver.readReg(AMIS30543Raw::WR) == wr &&
-            driver.readReg(AMIS30543Raw::CR0) == cr0 &&
-            driver.readReg(AMIS30543Raw::CR1) == cr1 &&
-            driver.readReg(AMIS30543Raw::CR2) == cr2 &&
-            driver.readReg(AMIS30543Raw::CR3) == cr3;
+        return driver.readReg(WR) == wr &&
+            driver.readReg(CR0) == cr0 &&
+            driver.readReg(CR1) == cr1 &&
+            driver.readReg(CR2) == cr2 &&
+            driver.readReg(CR3) == cr3;
     }
 
     /*! Re-writes the cached settings stored in this class to the device.
@@ -167,7 +167,7 @@ public:
         // before CR2 is written.  This could result in the motor being enabled
         // with incorrect settings.  Also, whenever we do write to CR2, we want to
         // also write the other registers to make sure they are in the correct state.
-        driver.writeReg(AMIS30543Raw::CR2, cr2);
+        driver.writeReg(CR2, cr2);
 
         writeWR();
         writeCR0();
@@ -242,8 +242,8 @@ public:
      * taking a step and before calling this function. */
     uint16_t readPosition()
     {
-        uint8_t sr3 = readStatusReg(AMIS30543Raw::SR3);
-        uint8_t sr4 = readStatusReg(AMIS30543Raw::SR4);
+        uint8_t sr3 = readStatusReg(SR3);
+        uint8_t sr4 = readStatusReg(SR4);
         return ((uint16_t)sr3 << 2) | (sr4 & 3);
     }
 
@@ -447,9 +447,9 @@ public:
      */
     uint16_t readStatusFlags()
     {
-        uint8_t sr0 = readStatusReg(AMIS30543Raw::SR0);
-        uint8_t sr1 = readStatusReg(AMIS30543Raw::SR1);
-        uint8_t sr2 = readStatusReg(AMIS30543Raw::SR2);
+        uint8_t sr0 = readStatusReg(SR0);
+        uint8_t sr1 = readStatusReg(SR1);
+        uint8_t sr2 = readStatusReg(SR2);
 
         return ((sr0 & 0x7C) >> 2) | ((sr1 & 0x78) << 2) | ((sr2 & 0x7C) << 7);
     }
@@ -468,26 +468,26 @@ protected:
 
     void writeWR()
     {
-        driver.writeReg(AMIS30543Raw::WR, wr);
+        driver.writeReg(WR, wr);
     }
 
     void writeCR0()
     {
-        driver.writeReg(AMIS30543Raw::CR0, cr0);
+        driver.writeReg(CR0, cr0);
     }
 
     void writeCR1()
     {
-        driver.writeReg(AMIS30543Raw::CR1, cr1);
+        driver.writeReg(CR1, cr1);
     }
 
     void writeCR3()
     {
-        driver.writeReg(AMIS30543Raw::CR3, cr3);
+        driver.writeReg(CR3, cr3);
     }
 
 public:
     // This is only marked as public for the purpose of testing; you should not
     // use it normally.
-    AMIS30543Raw driver;
+    AMIS30543SPI driver;
 };
