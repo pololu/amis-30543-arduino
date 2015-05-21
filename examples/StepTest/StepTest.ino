@@ -161,9 +161,22 @@ void testReadStatusFlags()
   if (flags)
   {
     Serial.println(F("A status flag was set."));
+    error();
+  }
+
+  // Set WDEN = 1 to enable the watchdog timer (32 ms).
+  writeReg(WR, 0x80);
+
+  delay(50);
+
+  flags = stepper.readStatusFlags();
+  if (flags != AMIS30543::WD)
+  {
+    Serial.println(F("Unexpected status flags."));
+    Serial.println(flags);
+    error();
   }
 }
-
 
 void testEnableDisableDriver()
 {

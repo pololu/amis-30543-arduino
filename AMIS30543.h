@@ -4,11 +4,11 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-class AMIS30543Raw
+class AMIS30543Raw  // TODO: rename to AMIS30543SPI
 {
 public:
 
-    // Addresses of control and status registers.
+    // Addresses of control and status registers.  // TODO: move to AMIS30543
     enum regAddr
     {
         WR  = 0x0,
@@ -21,24 +21,6 @@ public:
         SR2 = 0x6,
         SR3 = 0x7,
         SR4 = 0xA,
-    };
-
-    enum statusFlag
-    {
-        OPENY = (1 << 0),
-        OPENX = (1 << 1),
-        WD = (1 << 2),
-        CPFAIL = (1 << 3),
-        TW = (1 << 4),
-        OVCXNB = (1 << 5),
-        OVCXNT = (1 << 6),
-        OVCXPB = (1 << 7),
-        OVCXPT = (1 << 8),
-        TSD = (1 << 9),
-        OVCYNB = (1 << 10),
-        OVCYNT = (1 << 11),
-        OVCYPB = (1 << 12),
-        OVCYPT = (1 << 13),
     };
 
     void init(uint8_t slaveSelectPin)
@@ -115,6 +97,24 @@ public:
         CompensatedFullOnePhaseOn = 200,
         UncompensatedHalf = 201,
         UncompensatedFull = 202,
+    };
+
+    enum statusFlag
+    {
+        OPENY = (1 << 0),
+        OPENX = (1 << 1),
+        WD = (1 << 2),
+        CPFAIL = (1 << 3),
+        TW = (1 << 4),
+        OVCXNB = (1 << 5),
+        OVCXNT = (1 << 6),
+        OVCXPB = (1 << 7),
+        OVCXPT = (1 << 8),
+        TSD = (1 << 9),
+        OVCYNB = (1 << 10),
+        OVCYNT = (1 << 11),
+        OVCYPB = (1 << 12),
+        OVCYPT = (1 << 13),
     };
 
     void init(uint8_t slaveSelectPin)
