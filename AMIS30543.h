@@ -84,22 +84,26 @@ public:
         UncompensatedFull = 202,
     };
 
-    enum statusFlag
+    enum nonLatchedStatusFlag
     {
         OPENY = (1 << 0),
         OPENX = (1 << 1),
         WD = (1 << 2),
         CPFAIL = (1 << 3),
         TW = (1 << 4),
-        OVCXNB = (1 << 5),
-        OVCXNT = (1 << 6),
-        OVCXPB = (1 << 7),
-        OVCXPT = (1 << 8),
-        TSD = (1 << 9),
-        OVCYNB = (1 << 10),
-        OVCYNT = (1 << 11),
-        OVCYPB = (1 << 12),
-        OVCYPT = (1 << 13),
+    };
+
+    enum latchedStatusFlag
+    {
+        OVCXNB = (1 << 3),
+        OVCXNT = (1 << 4),
+        OVCXPB = (1 << 5),
+        OVCXPT = (1 << 6),
+        TSD = (1 << 10),
+        OVCYNB = (1 << 11),
+        OVCYNT = (1 << 12),
+        OVCYPB = (1 << 13),
+        OVCYPT = (1 << 14),
     };
 
     // Addresses of control and status registers.
@@ -424,20 +428,22 @@ public:
         applySettings();
     }
 
-    /*! Reads the status flags from registers SR0, SR1, and SR2.
+    /*! Reads the status flags from registers SR0.  These flags are not latched,
+     * which means they will be cleared as soon as the condition causing them is
+     * no longer detected.  See the AMIS-30543 datasheet for more information.
      *
-     * The return value is a 16-bit unsigned integer that has one bit for each
-     * status flag.  You can simply compare the return value to 0 to see if any
-     * of the status flags are set, or you can use the logical and operator (`&`)
-     * and the statusFlag enum to check individual flags.
+     * This function returns the raw value of SR0, with the parity bit set to 0.
+     * You can simply compare the return value to 0 to see if any of the status
+     * flags are set, or you can use the logical AND operator (`&`) and the
+     * nonLatchedStatusFlag enum to check individual flags.
      *
      * ~~~~{.cpp}
-     * uint16_t flags = stepper.readStatusFlags();
+     * uint16_t flags = stepper.readNonLatchedStatusFlags();
      * if (flags)
      * {
      *   // At least one flag is set.
      *
-     *   if (flags & AMIS3054::TSD)
+     *   if (flags & AMIS3054::OPENX)
      *   {
      *     // Thermal shutdown flag is set.
      *   }
@@ -445,13 +451,29 @@ public:
      * }
      * ~~~~
      */
-    uint16_t readStatusFlags()
+    uint16_t readNonLatchedStatusFlags()
     {
-        uint8_t sr0 = readStatusReg(SR0);
+        return readStatusReg(SR0);
+    }
+
+    /*! Reads the latched status flags from registers SR1 and SR2.  They are
+     *  cleared as a side effect.
+     *
+     * The return value is a 16-bit unsigned integer that has one bit for each
+     * status flag.  You can simply compare the return value to 0 to see if any
+     * of the status flags are set, or you can use the logical and operator (`&`)
+     * and the latchedStatusFlag enum to check individual flags.
+     *
+     * WARNING: Calling this function clears the latched error bits in SR1 and
+     * SR2, which might allow the motor driver outputs to reactivate.  The
+     * AMIS-30543 datasheet says "successive reading the SPI Status Registers 1
+     * and 2 in case of a short circuit condition, may lead to damage to the
+     * drivers". */
+    uint16_t readLatchedStatusFlagsAndClear()
+    {
         uint8_t sr1 = readStatusReg(SR1);
         uint8_t sr2 = readStatusReg(SR2);
-
-        return ((sr0 & 0x7C) >> 2) | ((sr1 & 0x78) << 2) | ((sr2 & 0x7C) << 7);
+        return (sr2 << 8) | sr1;
     }
 
 protected:
