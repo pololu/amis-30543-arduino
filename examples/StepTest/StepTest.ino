@@ -1,16 +1,21 @@
-/* This code is used to test all of the features of the library. */
+/* This code is used to test all of the features of the AMIS30543
+library.  It is mainly intended to be used by developers of the
+library.
+
+Power supply: 10 V, 1 A
+
+Scope setup:
+- Channel 1: pin 12
+- Channel 2: SLA
+- Channel 3: MOTXP
+- Trigger on a falling edge of channel 1.
+
+*/
 
 const uint8_t amisStepPin = 9;
 const uint8_t amisSlaveSelect = 10;
 const uint8_t amisClrPin = 11;
 const uint8_t scopeTriggerPin = 12;
-
-// Power supply: 10 V, 1 A
-
-// Scope setup:
-// Channel 1: pin 12;
-// Channel 2: SLA
-// Channel 3: MOTXP
 
 const bool skipAutoTests = false;
 
@@ -156,9 +161,9 @@ void testReadStatusFlags()
 {
   resetDriver();
 
-  uint16_t flags = stepper.readStatusFlags();
-
-  if (flags)
+  uint8_t nonLatchedFlags = stepper.readNonLatchedStatusFlags();
+  uint16_t latchedFlags = stepper.readLatchedStatusFlagsAndClear();
+  if (nonLatchedFlags || latchedFlags)
   {
     Serial.println(F("A status flag was set."));
     error();
@@ -169,11 +174,11 @@ void testReadStatusFlags()
 
   delay(50);
 
-  flags = stepper.readStatusFlags();
-  if (flags != AMIS30543::WD)
+  nonLatchedFlags = stepper.readNonLatchedStatusFlags();
+  if (nonLatchedFlags != AMIS30543::WD)
   {
     Serial.println(F("Unexpected status flags."));
-    Serial.println(flags);
+    Serial.println(nonLatchedFlags);
     error();
   }
 }
@@ -444,7 +449,7 @@ void testWithScope()
         stepper.setSlaTransparencyOff();
       }
 
-      // Verify that the system can recover nicely from an
+      // Verify that the system can detect and recover nicely from an
       // interruption to stepper motor power.  (It will have a lag of
       // 0-2 seconds because we only do this check every 2 seconds.)
       if (!stepper.verifySettings())

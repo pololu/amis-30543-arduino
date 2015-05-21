@@ -86,11 +86,11 @@ public:
 
     enum nonLatchedStatusFlag
     {
-        OPENY = (1 << 0),
-        OPENX = (1 << 1),
-        WD = (1 << 2),
-        CPFAIL = (1 << 3),
-        TW = (1 << 4),
+        OPENY = (1 << 2),
+        OPENX = (1 << 3),
+        WD = (1 << 4),
+        CPFAIL = (1 << 5),
+        TW = (1 << 6),
     };
 
     enum latchedStatusFlag
