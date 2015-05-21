@@ -1,3 +1,18 @@
+// Copyright Pololu Corporation.  For more information, see http://www.pololu.com/
+
+/*! \file AMIS30543.h
+ *
+ * This is the main header file for the AMIS30543 library, a library for
+ * controllering the AMIS-30543 micro-stepping stepper motor driver.
+ *
+ * For an overview of the features of this library, see
+ *
+ *   https://github.com/pololu/fastgpio-arduino
+ *
+ * That is the main repository for this library,
+ *
+ */
+
 #pragma once
 
 #include <stdint.h>
@@ -5,7 +20,7 @@
 #include <SPI.h>
 
 /*! This class provides low-level functions for reading and writing from the SPI
- * interface of an AMIS-30543 micro-stepping motor driver.
+ * interface of an AMIS-30543 micro-stepping stepper motor driver.
  *
  * Most users should use the AMIS30543 class, which provides a higher-level
  * interface, instead of this class. */
