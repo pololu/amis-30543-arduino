@@ -4,18 +4,24 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+/*! This class provides low-level functions for reading and writing from the SPI
+ * interface of an AMIS-30543 micro-stepping motor driver.
+ *
+ * Most users should use the AMIS30543 class, which provides a higher-level
+ * interface, instead of this class. */
 class AMIS30543SPI
 {
 public:
 
-    void init(uint8_t slaveSelectPin)
-    {
-        ssPin = slaveSelectPin;
+    /*! Configures this object to use the specified pin as a slave select pin.
+     * You must use a slave select pin; the AMIS-30543 requires it. */
+    void init(uint8_t slaveSelectPin) { ssPin = slaveSelectPin;
 
         digitalWrite(ssPin, HIGH);
         pinMode(ssPin, OUTPUT);
     }
 
+    /*! Reads the register at the given address and returns its raw value. */
     uint8_t readReg(uint8_t address)
     {
         selectChip();
@@ -25,6 +31,7 @@ public:
         return dataOut;
     }
 
+    /*! Writes the specified value to a register. */
     void writeReg(uint8_t address, uint8_t value)
     {
         selectChip();
@@ -63,10 +70,21 @@ private:
     uint8_t ssPin;
 };
 
+/*! This class provides high-level functions for controlling an AMIS-30543
+ *  micro-stepping motor driver.
+ *
+ * It provides access to all the features of the AMIS-30543 SPI interface
+ * except the watchdog timer. */
 class AMIS30543
 {
 public:
+    /*! The default constructor. */
+    AMIS30543()
+    {
+        wr = cr0 = cr1 = cr2 = cr3 = 0;
+    }
 
+    /*! Possible arguments to setStepMode(). */
     enum stepMode
     {
         MicroStep128 = 128,
@@ -84,6 +102,7 @@ public:
         UncompensatedFull = 202,
     };
 
+    /*! Bitmasks for the return value of readNonLatchedStatusFlags(). */
     enum nonLatchedStatusFlag
     {
         OPENY = (1 << 2),
@@ -93,6 +112,7 @@ public:
         TW = (1 << 6),
     };
 
+    /*! Bitmasks for the return value of readLatchedStatusFlagsAndClear(). */
     enum latchedStatusFlag
     {
         OVCXNB = (1 << 3),
@@ -106,7 +126,7 @@ public:
         OVCYPT = (1 << 14),
     };
 
-    // Addresses of control and status registers.
+    /*! Addresses of control and status registers. */
     enum regAddr
     {
         WR  = 0x0,
@@ -121,11 +141,18 @@ public:
         SR4 = 0xA,
     };
 
+    /*! Configures this object to use the specified pin as a slave select pin.
+     * You must use a slave select pin; the AMIS-30543 requires it. */
     void init(uint8_t slaveSelectPin)
     {
         driver.init(slaveSelectPin);
     }
 
+    /*! Changes all of the driver's settings back to their default values.
+     *
+     * It is good to call this near the beginning of your program to ensure that
+     * There are no settings left over from an earlier time that might affect the
+     * operation of the driver. */
     void resetSettings()
     {
         wr = cr0 = cr1 = cr2 = cr3 = 0;
@@ -179,12 +206,18 @@ public:
         writeCR3();
     }
 
+    /*! Sets the MOTEN bit to 1, enabling the driver.
+     *
+     * Please read the note about this function in README.md. */
     void enableDriver()
     {
         cr2 |= 0b10000000;
         applySettings();
     }
 
+    /*! Sets the MOTEN bit to 0, disabling the driver.
+     *
+     * Please read the note about this function in README.md. */
     void disableDriver()
     {
         cr2 &= ~0b10000000;
@@ -480,6 +513,8 @@ protected:
 
     uint8_t wr, cr0, cr1, cr2, cr3;
 
+    /*! Reads a status register and returns the lower 7 bits (the parity bit is
+     *  set to 0 in the return value). */
     uint8_t readStatusReg(uint8_t address)
     {
         // Mask off the parity bit.
@@ -488,28 +523,33 @@ protected:
         return driver.readReg(address) & 0x7F;
     }
 
+    /*! Writes the cached value of the WR register to the device. */
     void writeWR()
     {
         driver.writeReg(WR, wr);
     }
 
+    /*! Writes the cached value of the CR0 register to the device. */
     void writeCR0()
     {
         driver.writeReg(CR0, cr0);
     }
 
+    /*! Writes the cached value of the CR1 register to the device. */
     void writeCR1()
     {
         driver.writeReg(CR1, cr1);
     }
 
+    /*! Writes the cached value of the CR3 register to the device. */
     void writeCR3()
     {
         driver.writeReg(CR3, cr3);
     }
 
 public:
-    // This is only marked as public for the purpose of testing; you should not
-    // use it normally.
+    /*! This object handles all the communication with the AMIS-30543.  It is
+     * only marked as public for the purpose of testing this library; you should
+     * not use it in your code. */
     AMIS30543SPI driver;
 };
