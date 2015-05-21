@@ -95,7 +95,7 @@ void testResetSettings()
 
   if (readReg(WR) != 0b01111000)
   {
-    Serial.println(F("Writing or reading WR failed."));
+    Serial.println(F("Writing or reading WR failed; driver power might be off."));
     error();
   }
 
@@ -395,7 +395,7 @@ void testWithScope()
       // By triggering on channel 3 and zooming in to 100 ns/div,
       // verify that the PWM fall (or rise) time increases every 2
       // seconds, for a total of 4 different settings.
-      //stepper.setPwmSlope(m);
+      stepper.setPwmSlope(mode);
 
       // Verify that the SLA gain changes every two seconds.
       // (The two settings are 0.5 and 0.25.)
@@ -424,13 +424,7 @@ void testWithScope()
       if (!stepper.verifySettings())
       {
         stepper.applySettings();
-
-        if (stepper.verifySettings())
-        {
-          // TODO: fix the  API so this part really works
-          Serial.println(F("Successfully reapplied settings."));
-        }
-        else
+        if (!stepper.verifySettings())
         {
           Serial.println(F("Could not verify settings; driver power might be off."));
         }
