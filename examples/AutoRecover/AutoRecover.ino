@@ -2,10 +2,13 @@
 from various errors that can occur when using the AMIS-30543,
 including an interruption of the motor power supply.
 
-Before using this example, be sure to change the parameter to
-setCurrentMilliamps to an appropriate current limit for your
-system.  Also, see this library's documentation for information
-about how to connect the driver:
+It also shows how to change the motor direction using SPI.  The
+DIR pin is not used and does not need to be connected.
+
+Before using this example, be sure to change the
+setCurrentMilliamps line to have an appropriate current limit for
+your system.  Also, see this library's documentation for
+information about how to connect the driver:
 
     http://pololu.github.io/amis-30543-arduino/
 */
@@ -48,7 +51,12 @@ void takeSteps()
     return;
   }
 
-  if ((millis() & 1023) >= 774)
+  uint16_t m = millis();
+
+  // We will switch directions after each pause.
+  bool desiredDirection = m >> 10 & 1;
+
+  if ((m & 1023) >= 774)
   {
     // Pause for 250 ms once per second.
   }
@@ -60,7 +68,13 @@ void takeSteps()
     {
       lastStepTime = micros();
 
-      // The NXT minimum high pulse width is 2 microseconds.
+      // Send the SPI command to change the direction, but only
+      // if it is needed.
+      if (desiredDirection != stepper.getDirection())
+      {
+        stepper.setDirection(desiredDirection);
+      }
+
       digitalWrite(amisStepPin, HIGH);
       delayMicroseconds(3);
       digitalWrite(amisStepPin, LOW);
