@@ -4,8 +4,8 @@ driver.
 It shows how to initialize the dirver, set the current limit, set
 the micro-stepping mode, and enable the driver.  It shows how to
 send pulses to the step pin to get the driver to take steps and
-how to switch directions over SPI.  (The DIR pin is not used and
-does not need to be connected.)
+how to switch directions over SPI.  The DO and DIR pins are not
+used and do not need to be connected.
 
 Before using this example, be sure to change the
 setCurrentMilliamps line to have an appropriate current limit for
