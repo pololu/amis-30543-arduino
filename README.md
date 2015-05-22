@@ -64,7 +64,7 @@ the installation instructions above.
 
 For complete documentation of this library, including many features that were
 not mentioned here, see
-[the amis-30543-arduino documentation](https://pololu.github.io/amis-30543-arduino/).
+[the amis-30543-arduino documentation](https://pololu.github.io/amis-30543-arduino/).  If you are already on that page, see the AMIS30543 class reference.
 
 ## Handling interruptions in stepper motor power
 
