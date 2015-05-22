@@ -332,6 +332,9 @@ public:
      * how much the output moves for each step taken and how much current flows
      * through the coils in each stepping position.
      *
+     * The argument to this function should be one of the members of the
+     * #stepMode enum.
+     *
      * If an invalid stepping mode is passed to this function, then it selects
      * 1/32 micro-step, which is the driver's default. */
     void setStepMode(uint8_t mode)
