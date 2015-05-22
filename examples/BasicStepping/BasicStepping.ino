@@ -18,8 +18,8 @@ information about how to connect the driver:
 #include <SPI.h>
 #include <AMIS30543.h>
 
-const uint8_t amisSlaveSelect = 9;
-const uint8_t amisStepPin = 10;
+const uint8_t amisSlaveSelect = 4;
+const uint8_t amisStepPin = 5;
 
 AMIS30543 stepper;
 

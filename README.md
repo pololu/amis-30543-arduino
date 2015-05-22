@@ -20,14 +20,15 @@ An [AMIS-30543 carrier](https://www.pololu.com/product/2970) can be purchased fr
 
 You will need to connect your motor, motor power, and IOREF as described on the product page.  You should also make the following connections between the Arduino and the driver:
 
-    Arduino pin 10  - driver STEP
-    Arduino pin 9   - driver CS
+    Arduino pin 6   - driver DIR
+    Arduino pin 5   - driver STEP
+    Arduino pin 4   - driver CS
     Arduino SCK     - driver CLK
     Arduino MOSI    - driver DI
-    Arduino MISO    - driver DO   (optional)
+    Arduino MISO    - driver DO
     Arduino GND     - driver GND
 
-The DO pin is only needed if you want to read information back from the stepper driver.
+The DO pin is only needed if you want to read information back from the stepper driver.  The DIR pin is also optional and not used in every example.
 
 The SPI pins (MOSI, MISO, and SCK) on Arduino-compatible boards are sometimes not labeled.  You should refer to the documentation for your particular board to find the locations of these pins.
 
