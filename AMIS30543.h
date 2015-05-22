@@ -483,7 +483,7 @@ public:
      * This function returns the raw value of SR0, with the parity bit set to 0.
      * You can simply compare the return value to 0 to see if any of the status
      * flags are set, or you can use the logical AND operator (`&`) and the
-     * nonLatchedStatusFlag enum to check individual flags.
+     * #nonLatchedStatusFlag enum to check individual flags.
      *
      * ~~~~{.cpp}
      * uint16_t flags = stepper.readNonLatchedStatusFlags();
@@ -491,7 +491,7 @@ public:
      * {
      *   // At least one flag is set.
      *
-     *   if (flags & AMIS3054::OPENX)
+     *   if (flags & AMIS30543::OPENX)
      *   {
      *     // Thermal shutdown flag is set.
      *   }
@@ -510,7 +510,7 @@ public:
      * The return value is a 16-bit unsigned integer that has one bit for each
      * status flag.  You can simply compare the return value to 0 to see if any
      * of the status flags are set, or you can use the logical and operator (`&`)
-     * and the latchedStatusFlag enum to check individual flags.
+     * and the #latchedStatusFlag enum to check individual flags.
      *
      * WARNING: Calling this function clears the latched error bits in SR1 and
      * SR2, which might allow the motor driver outputs to reactivate.  The
