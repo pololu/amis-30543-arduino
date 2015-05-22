@@ -318,6 +318,14 @@ public:
         writeCR1();
     }
 
+    /*! Returns the cached value of the DIRCTRL configuration bit.
+     *
+     * This does not perform any SPI communication with the driver. */
+    bool getDirection()
+    {
+        return cr1 >> 7 & 1;
+    }
+
     /*! Configures the driver to have the specified stepping mode.
      *
      * This affects many things about the performance of the motor, including
