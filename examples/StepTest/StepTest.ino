@@ -14,9 +14,6 @@ Scope setup:
 
 const uint8_t amisSlaveSelect = 9;
 const uint8_t amisStepPin = 10;
-
-const uint8_t amisStepPin = 9;
-const uint8_t amisSlaveSelect = 10;
 const uint8_t amisClrPin = 11;
 const uint8_t scopeTriggerPin = 12;
 
