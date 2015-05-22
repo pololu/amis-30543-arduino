@@ -33,12 +33,11 @@ The DO pin is only needed if you want to read information back from the stepper 
 The SPI pins (MOSI, MISO, and SCK) on Arduino-compatible boards are sometimes not labeled.  You should refer to the documentation for your particular board to find the locations of these pins.
 
 On the [Arduino Uno](https://www.pololu.com/product/2191), [Arduino Leonardo](https://www.pololu.com/product/2192), and the [A-Star 32U4 controllers](https://www.pololu.com/category/149/a-star-programmable-controllers), the SPI pins (SCK, MOSI, and MISO) can be found on the 6-pin ISP header.
-
 The [Arduino Uno](https://www.pololu.com/product/2191) has additional access points for the SPI pins: pin 11 is MOSI, pin 12 is MISO, and pin 13 is SCK.
 
 ### Software
 
-If you are using version 1.6.2 or later of the [Arduino IDE](http://www.arduino.cc/en/Main/Software), you can use the Library Manager to install this library:
+If you are using version 1.6.2 or later of the [Arduino software (IDE)](http://www.arduino.cc/en/Main/Software), you can use the Library Manager to install this library:
 
 1. In the Arduino IDE, open the "Sketch" menu, select "Include Library", then "Manage Libraries...".
 2. Search for "AMIS30543".
@@ -49,7 +48,7 @@ If this does not work, you can manually install the library:
 
 1. Download the [latest release archive from GitHub](https://github.com/pololu/amis-30543-arduino/releases) and decompress it.
 2. Rename the folder "amis-30543-arduino-xxxx" to "AMIS30543".
-3. Drag the "AMIS30543" folder into the "libraries" directory inside your Arduino sketchbook directory.  You can view your sketchbook location by opening the **"File"** menu and selecting **"Preferences"** in the Arduino IDE.  If there is not already a "libraries" folder in that location, you should make the folder yourself.
+3. Drag the "AMIS30543" folder into the "libraries" directory inside your Arduino sketchbook directory.  You can view your sketchbook location by opening the "File" menu and selecting "Preferences" in the Arduino IDE.  If there is not already a "libraries" folder in that location, you should make the folder yourself.
 4. After installing the library, restart the Arduino IDE.
 
 ## Examples
