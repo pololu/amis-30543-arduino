@@ -20,8 +20,8 @@ An [AMIS-30543 carrier](https://www.pololu.com/product/2970) can be purchased fr
 
 You will need to connect your motor, motor power, and IOREF as described on the product page.  You should also make the following connections between the Arduino and the driver:
 
-    Arduino pin 6   - driver DIR
-    Arduino pin 5   - driver STEP
+    Arduino pin 2   - driver DIR
+    Arduino pin 3   - driver STEP
     Arduino pin 4   - driver CS
     Arduino SCK     - driver CLK
     Arduino MOSI    - driver DI

@@ -18,9 +18,9 @@ information about how to connect the driver:
 #include <SPI.h>
 #include <AMIS30543.h>
 
+const uint8_t amisDirPin = 2;
+const uint8_t amisStepPin = 3;
 const uint8_t amisSlaveSelect = 4;
-const uint8_t amisStepPin = 5;
-const uint8_t amisDirPin = 6;
 
 AMIS30543 stepper;
 
@@ -43,7 +43,7 @@ void setup()
 
   // Set the current limit.  You should change the number here to
   // an appropriate value for your particular system.
-  stepper.setCurrentMilliamps(135);
+  stepper.setCurrentMilliamps(132);
 
   // Set the number of microsteps that correspond to one full step.
   stepper.setStepMode(32);

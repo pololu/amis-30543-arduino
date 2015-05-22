@@ -16,8 +16,8 @@ information about how to connect the driver:
 #include <SPI.h>
 #include <AMIS30543.h>
 
+const uint8_t amisStepPin = 3;
 const uint8_t amisSlaveSelect = 4;
-const uint8_t amisStepPin = 5;
 
 AMIS30543 stepper;
 
@@ -33,7 +33,7 @@ void setup()
 
   stepper.init(amisSlaveSelect);
   stepper.resetSettings();
-  stepper.setCurrentMilliamps(245);
+  stepper.setCurrentMilliamps(132);
   stepper.enableDriver();
 }
 

@@ -5,17 +5,19 @@ library.
 Power supply: 10 V, 1 A
 
 Scope setup:
-- Channel 1: pin 1
+- Channel 1: pin 9
 - Channel 2: SLA
 - Channel 3: MOTXP
 - Trigger on a falling edge of channel 1.
 
 */
 
-const uint8_t scopeTriggerPin = 1;
-const uint8_t amisClrPin = 3;
+// TODO: add a test for getDirection
+
+const uint8_t amisStepPin = 3;
 const uint8_t amisSlaveSelect = 4;
-const uint8_t amisStepPin = 5;
+const uint8_t amisClrPin = 5;
+const uint8_t scopeTriggerPin = 9;
 
 const bool skipAutoTests = false;
 
