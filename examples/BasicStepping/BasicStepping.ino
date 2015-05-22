@@ -1,11 +1,16 @@
-/* This example shows how to detect and automatically recover
-from various errors that can occur when using the AMIS-30543,
-including an interruption of the motor power supply.
+/* This example shows basic use of the AMIS-30543 stepper motor
+driver.
 
-Before using this example, be sure to change the parameter to
-setCurrentMilliamps to an appropriate current limit for your
-system.  Also, see this library's documentation for information
-about how to connect the driver:
+It shows how to initialize the dirver, set the current limit, set
+the micro-stepping mode, and enable the driver.  It shows how to
+send pulses to the step pin to get the driver to take steps and
+how to switch directions over SPI.  (The DIR pin is not used and
+does not need to be connected.)
+
+Before using this example, be sure to change the
+setCurrentMilliamps line to have an appropriate current limit for
+your system.  Also, see this library's documentation for
+information about how to connect the driver:
 
     http://pololu.github.io/amis-30543-arduino/
 */
@@ -27,12 +32,36 @@ void setup()
   stepper.init(amisSlaveSelect);
   stepper.resetSettings();
   stepper.setCurrentMilliamps(245);
+  stepper.setStepMode(32);
   stepper.enableDriver();
 }
 
 void loop()
 {
-  // The NXT minimum high pulse width is 2 microseconds.
+  // Step in the default direction 1000 times.
+  stepper.setDirection(0);
+  for (unsigned int x = 0; x < 1000; x++)
+  {
+    step();
+  }
+
+  // Wait for 300 ms.
+  delay(300);
+
+  // Step in the other direction 1000 times.
+  stepper.setDirection(1);
+  for (unsigned int x = 0; x < 1000; x++)
+  {
+    step();
+  }
+
+  // Wait for 300 ms.
+  delay(300);
+}
+
+void step()
+{
+  // Send a pulse on the NXT/STEP pin to tell the driver to take one step.
   digitalWrite(amisStepPin, HIGH);
   delayMicroseconds(3);
   digitalWrite(amisStepPin, LOW);
