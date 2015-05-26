@@ -7,7 +7,7 @@
  *
  * For an overview of the features of this library, see
  *
- *   https://github.com/pololu/fastgpio-arduino
+ *   https://github.com/pololu/amis-30543-arduino
  *
  * That is the main repository for this library,
  *
