@@ -5,11 +5,11 @@
  * This is the main header file for the AMIS30543 library, a library for
  * controllering the AMIS-30543 micro-stepping stepper motor driver.
  *
- * For an overview of the features of this library, see
+ * For more information about this library, see:
  *
  *   https://github.com/pololu/amis-30543-arduino
  *
- * That is the main repository for this library,
+ * That is the main repository for this library.
  *
  */
 
@@ -242,7 +242,7 @@ public:
     /*! Sets the per-coil current limit equal to the highest available setting
      * that is less than the given current, in units of milliamps.
      *
-     * Refer to Table 13 of the AMIS 30543 datasheet to see which current limits
+     * Refer to Table 13 of the AMIS-30543 datasheet to see which current limits
      * are available. */
     void setCurrentMilliamps(uint16_t current)
     {
@@ -282,7 +282,7 @@ public:
      * and 511.
      *
      * The different positions and their corresponding coil values are listed in
-     * Table 9 of the AMIS 30543 datasheet.
+     * Table 9 of the AMIS-30543 datasheet.
      *
      * The lower two bits of this return value might be inaccurate if the step
      * pin is being toggled while this function runs (e.g. from an interrupt or
