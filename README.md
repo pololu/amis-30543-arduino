@@ -1,7 +1,7 @@
 # AMIS-30543 library for Arduino
 
-Version: 1.0.0<br/>
-Release date: 2015 May 21<br/>
+Version: 1.1.0<br/>
+Release date: 2015 May 26<br/>
 [www.pololu.com](https://www.pololu.com/)
 
 ## Summary
@@ -28,7 +28,7 @@ You will need to connect your motor, motor power, and IOREF as described on the 
     Arduino MISO    - driver DO
     Arduino GND     - driver GND
 
-The DO pin is only needed if you want to read information back from the stepper driver.  The DIR pin is also optional and not used in every example.
+The DO pin is only needed if you want to read information back from the stepper driver.  Since the direction of the motor can be changed using the SPI interface, the DIR pin is also optional and not used in every example.
 
 The SPI pins (MOSI, MISO, and SCK) on Arduino-compatible boards are sometimes not labeled.  You should refer to the documentation for your particular board to find the locations of these pins.
 
@@ -91,4 +91,5 @@ An open coil condition is only detected after a motor output PWM signal has been
 
 ## Version history
 
+* 1.1.0 (2015 May 26): Added an example that uses the [AccelStepper](http://www.airspayce.com/mikem/arduino/AccelStepper/) library.  Moved the DIR and STEP pins in the examples to pins 2 and 3.
 * 1.0.0 (2015 May 21): Original release.
