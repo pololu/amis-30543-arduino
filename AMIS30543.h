@@ -30,8 +30,8 @@ public:
 
     /*! Configures this object to use the specified pin as a slave select pin.
      * You must use a slave select pin; the AMIS-30543 requires it. */
-    void init(uint8_t slaveSelectPin) { ssPin = slaveSelectPin;
-
+    void init(uint8_t slaveSelectPin) {
+        ssPin = slaveSelectPin;
         digitalWrite(ssPin, HIGH);
         pinMode(ssPin, OUTPUT);
     }
