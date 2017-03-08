@@ -464,7 +464,7 @@ void testWithScope()
       }
     }
 
-    cli();
+    noInterrupts();
 
     digitalWrite(scopeTriggerPin, HIGH);
     delayMicroseconds(100);
@@ -485,7 +485,7 @@ void testWithScope()
     nextStep();
     delay(1);
 
-    sei();
+    interrupts();
 
     // Get back to the starting position.
     for (uint8_t i = 0; i < 30; i++)
