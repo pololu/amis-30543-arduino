@@ -6,6 +6,8 @@ cache:
 
 install:
 - pip install -U platformio
+- wget http://www.airspayce.com/mikem/arduino/AccelStepper/AccelStepper-1.56.zip
+- unzip AccelStepper-1.56.zip -d /tmp
 
 env:
 - BOARD=uno
@@ -20,5 +22,5 @@ env:
 script:
 - set -eo pipefail;
   for e in examples/*; do
-    platformio ci --board=$BOARD --lib=. $e/*;
+    platformio ci --board=$BOARD --lib=. --lib=/tmp/AccelStepper $e/*;
   done
