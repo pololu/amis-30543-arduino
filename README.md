@@ -2,7 +2,6 @@
 
 Version: 1.1.0<br/>
 Release date: 2015 May 26<br/>
-[![Build Status](https://travis-ci.org/pololu/amis-30543-arduino.svg?branch=master)](https://travis-ci.org/pololu/amis-30543-arduino)<br/>
 [www.pololu.com](https://www.pololu.com/)
 
 ## Summary
